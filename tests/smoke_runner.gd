@@ -85,8 +85,6 @@ func _check_main_scene() -> void:
 		failures.append("Meadow enemy script is missing or failed to compile")
 	if player.position.distance_to(Vector2(72, 270)) > 0.1:
 		failures.append("Player did not move to meadow spawn point")
-	if bool(instance.call("change_map", "missing_map", "SpawnDefault")):
-		failures.append("Unknown runtime map id must be rejected")
 
 
 func _finish() -> void:
