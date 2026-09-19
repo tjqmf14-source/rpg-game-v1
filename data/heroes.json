@@ -1,0 +1,29 @@
+[
+  {
+    "id": "wanderer",
+    "name": "방랑자",
+    "role": "adventurer",
+    "element": "neutral",
+    "rarity": "common",
+    "base_stats": { "hp": 120, "attack": 16, "defense": 10, "speed": 90 },
+    "unlock": { "type": "starter" }
+  },
+  {
+    "id": "rowan_knight",
+    "name": "로완",
+    "role": "knight",
+    "element": "light",
+    "rarity": "rare",
+    "base_stats": { "hp": 180, "attack": 18, "defense": 20, "speed": 65 },
+    "unlock": { "type": "quest", "key": "ruined_watchtower" }
+  },
+  {
+    "id": "mira_apprentice",
+    "name": "미라",
+    "role": "mage",
+    "element": "fire",
+    "rarity": "rare",
+    "base_stats": { "hp": 90, "attack": 27, "defense": 7, "speed": 78 },
+    "unlock": { "type": "quest", "key": "embers_in_the_well" }
+  }
+]

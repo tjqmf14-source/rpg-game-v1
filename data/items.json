@@ -1,0 +1,31 @@
+[
+  {
+    "id": "wild_herb",
+    "name": "야생 약초",
+    "type": "material",
+    "rarity": "common",
+    "stack_limit": 99
+  },
+  {
+    "id": "iron_scrap",
+    "name": "철 조각",
+    "type": "material",
+    "rarity": "common",
+    "stack_limit": 99
+  },
+  {
+    "id": "ancient_shard",
+    "name": "고대의 파편",
+    "type": "relic_material",
+    "rarity": "rare",
+    "stack_limit": 30
+  },
+  {
+    "id": "traveler_sword",
+    "name": "여행자의 검",
+    "type": "weapon",
+    "rarity": "common",
+    "stack_limit": 1,
+    "stats": { "attack": 4 }
+  }
+]
