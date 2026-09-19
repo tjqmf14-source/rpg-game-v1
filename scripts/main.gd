@@ -10,6 +10,7 @@ const VIEWPORT_SIZE := Vector2i(480, 270)
 func _ready() -> void:
 	queue_redraw()
 	GameState.player_leveled_up.connect(_on_player_leveled_up)
+	GameState.hero_unlocked.connect(_on_hero_unlocked)
 	_update_hud()
 
 
@@ -40,7 +41,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, Vector2(VIEWPORT_SIZE)), Color("667a3f"))
-
 	draw_rect(Rect2(0, 112, 480, 48), Color("a98b5d"))
 	draw_rect(Rect2(208, 0, 64, 270), Color("a98b5d"))
 
@@ -59,7 +59,9 @@ func _update_hud() -> void:
 	if label == null:
 		return
 
-	label.text = "Lv.%d  HP %d/%d  XP %d/%d  Gold %d" % [
+	var hero := GameDatabase.get_hero(GameState.get_active_hero_id())
+	label.text = "%s  Lv.%d  HP %d/%d  XP %d/%d  Gold %d" % [
+		String(hero.get("name", "방랑자")),
 		GameState.player_level,
 		GameState.player_hp,
 		GameState.player_max_hp,
@@ -77,3 +79,8 @@ func _show_toast(message: String) -> void:
 
 func _on_player_leveled_up(new_level: int) -> void:
 	_show_toast("Level Up! Lv.%d" % new_level)
+
+
+func _on_hero_unlocked(hero_id: String) -> void:
+	var hero := GameDatabase.get_hero(hero_id)
+	_show_toast("%s joined!" % String(hero.get("name", hero_id)))
