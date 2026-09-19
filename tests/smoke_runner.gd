@@ -54,6 +54,8 @@ func _check_main_scene() -> void:
 		failures.append("Main map controller script is missing or failed to compile")
 	if player == null or player.get_script() == null or not player.has_method("take_damage"):
 		failures.append("Player script is missing or failed to compile")
+	elif player.get_node_or_null("Visual") == null:
+		failures.append("Generated player visual was not created")
 	if collection_panel == null or collection_panel.get_script() == null:
 		failures.append("Collection panel script is missing or failed to compile")
 	if world_root == null or world_root.get_child_count() != 1:
@@ -83,6 +85,8 @@ func _check_main_scene() -> void:
 		failures.append("Meadow scene/script failed to load")
 	if slime == null or slime.get_script() == null or not slime.has_method("take_damage"):
 		failures.append("Meadow enemy script is missing or failed to compile")
+	elif slime.get_node_or_null("Visual") == null:
+		failures.append("Generated enemy visual was not created")
 	if player.position.distance_to(Vector2(72, 270)) > 0.1:
 		failures.append("Player did not move to meadow spawn point")
 

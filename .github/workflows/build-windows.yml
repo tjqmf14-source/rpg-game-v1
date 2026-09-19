@@ -37,6 +37,9 @@ jobs:
       - name: Data integrity test
         run: godot --headless --path . --script res://tests/data_integrity_test.gd
 
+      - name: Asset integrity test
+        run: godot --headless --path . --script res://tests/asset_integrity_test.gd
+
       - name: Gameplay regression test
         run: godot --headless --path . res://tests/gameplay_regression_runner.tscn
 

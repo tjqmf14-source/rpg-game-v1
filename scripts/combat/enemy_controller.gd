@@ -2,6 +2,8 @@ extends CharacterBody2D
 class_name EnemyController
 
 const PLAYER_HURTBOX_MASK := 8
+const ENEMY_SHEET := preload("res://assets/generated/monsters/enemies_v1.png")
+const FRAME_SIZE := Vector2i(16, 16)
 
 @export var monster_id: String = "meadow_slime"
 @export var max_hp: int = 36
@@ -20,21 +22,31 @@ var hp: int
 var target: Node2D
 var attack_cooldown_left: float = 0.0
 var hurt_flash_left: float = 0.0
+var animation_clock: float = 0.0
+var animation_frame: int = 0
+var visual: Sprite2D
 
 
 func _ready() -> void:
 	hp = max_hp
 	add_to_group("enemies")
 	target = get_tree().get_first_node_in_group("player") as Node2D
-	queue_redraw()
+	_ensure_visual()
+	_update_visual_frame()
 
 
 func _physics_process(delta: float) -> void:
 	attack_cooldown_left = maxf(0.0, attack_cooldown_left - delta)
+	animation_clock += delta
+	if animation_clock >= 0.16:
+		animation_clock = 0.0
+		animation_frame = (animation_frame + 1) % 4
+		_update_visual_frame()
 
 	if hurt_flash_left > 0.0:
 		hurt_flash_left = maxf(0.0, hurt_flash_left - delta)
-		queue_redraw()
+		if visual != null and hurt_flash_left <= 0.0:
+			visual.modulate = Color.WHITE
 
 	if GameState.dialogue_open or GameState.menu_open:
 		velocity = Vector2.ZERO
@@ -70,7 +82,6 @@ func _physics_process(delta: float) -> void:
 func _try_attack(offset_to_player: Vector2) -> void:
 	var shape := CircleShape2D.new()
 	shape.radius = attack_hitbox_radius
-
 	var direction := Vector2.DOWN
 	if offset_to_player.length_squared() > 0.001:
 		direction = offset_to_player.normalized()
@@ -94,11 +105,10 @@ func _try_attack(offset_to_player: Vector2) -> void:
 func take_damage(amount: int, _source: Node = null) -> void:
 	if amount <= 0 or hp <= 0:
 		return
-
 	hp = maxi(0, hp - amount)
 	hurt_flash_left = 0.1
-	queue_redraw()
-
+	if visual != null:
+		visual.modulate = Color("ffd0c9")
 	if hp == 0:
 		_die()
 
@@ -107,51 +117,39 @@ func _die() -> void:
 	GameState.record_monster_defeat(monster_id)
 	GameState.add_experience(xp_reward)
 	GameState.add_gold(gold_reward)
-
 	if not item_drop_id.is_empty() and randf() <= item_drop_chance:
 		GameState.add_item(item_drop_id, 1)
-
 	queue_free()
 
 
-func _draw() -> void:
-	var base_color := Color("79ad42")
-	var accent := Color("315727")
+func _ensure_visual() -> void:
+	visual = get_node_or_null("Visual") as Sprite2D
+	if visual == null:
+		visual = Sprite2D.new()
+		visual.name = "Visual"
+		add_child(visual)
+	visual.texture = ENEMY_SHEET
+	visual.region_enabled = true
+	visual.centered = true
+	visual.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
+
+func _monster_row() -> int:
 	match monster_id:
 		"goblin_scout":
-			base_color = Color("728646")
-			accent = Color("3c4428")
+			return 1
 		"restless_skeleton":
-			base_color = Color("d2c5a5")
-			accent = Color("6d6659")
+			return 2
 		_:
-			base_color = Color("79ad42")
-			accent = Color("315727")
+			return 0
 
-	if hurt_flash_left > 0.0:
-		base_color = Color("f6d0c3")
 
-	if monster_id == "meadow_slime":
-		draw_circle(Vector2(0, 2), 6.0, base_color)
-		draw_rect(Rect2(-5, 4, 10, 3), accent)
-		draw_rect(Rect2(-3, 0, 1, 1), Color("182018"))
-		draw_rect(Rect2(2, 0, 1, 1), Color("182018"))
-	elif monster_id == "restless_skeleton":
-		draw_circle(Vector2(0, -3), 4.0, base_color)
-		draw_rect(Rect2(-4, 1, 8, 7), base_color)
-		draw_rect(Rect2(-2, -4, 1, 1), Color("25231f"))
-		draw_rect(Rect2(1, -4, 1, 1), Color("25231f"))
-		draw_line(Vector2(4, 0), Vector2(8, -5), accent, 2.0)
-	else:
-		draw_circle(Vector2(0, -3), 4.0, base_color)
-		draw_rect(Rect2(-5, 1, 10, 7), accent)
-		draw_polygon(
-			PackedVector2Array([Vector2(-4, -4), Vector2(-8, -6), Vector2(-4, -1)]),
-			PackedColorArray([base_color])
-		)
-		draw_polygon(
-			PackedVector2Array([Vector2(4, -4), Vector2(8, -6), Vector2(4, -1)]),
-			PackedColorArray([base_color])
-		)
-		draw_line(Vector2(4, 2), Vector2(8, -2), Color("b8b2a5"), 2.0)
+func _update_visual_frame() -> void:
+	if visual == null:
+		return
+	visual.region_rect = Rect2(
+		animation_frame * FRAME_SIZE.x,
+		_monster_row() * FRAME_SIZE.y,
+		FRAME_SIZE.x,
+		FRAME_SIZE.y
+	)

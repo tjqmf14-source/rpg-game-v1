@@ -2,6 +2,7 @@ extends Node2D
 
 const MAP_SIZE := Vector2i(960, 540)
 const TILE_SIZE := 16
+const TILES := preload("res://assets/generated/tiles/world_tiles_v1.png")
 
 
 func _ready() -> void:
@@ -9,36 +10,39 @@ func _ready() -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO, Vector2(MAP_SIZE)), Color("73944a"))
+	_fill_tiles(Rect2i(0, 0, MAP_SIZE.x, MAP_SIZE.y), 0)
+	_fill_tiles(Rect2i(0, 240, 960, 64), 1)
+	_fill_tiles(Rect2i(448, 0, 80, 540), 3)
 
-	# Road from village into the field.
-	draw_rect(Rect2(0, 238, 960, 64), Color("aa8e62"))
+	for y in range(240, 304, 16):
+		for x in range(432, 544, 16):
+			_draw_tile(13, Vector2i(x, y))
 
-	# River and bridge.
-	draw_rect(Rect2(446, 0, 84, 540), Color("477f96"))
-	for y in range(0, 540, 24):
-		draw_line(Vector2(454, y), Vector2(522, y + 8), Color(0.7, 0.9, 0.95, 0.18), 2.0)
-	draw_rect(Rect2(430, 232, 116, 76), Color("8a623c"))
-	for x in range(438, 540, 16):
-		draw_rect(Rect2(x, 238, 10, 64), Color("aa7b48"))
-
-	# Flower/grass patches.
 	for point in [
-		Vector2(176, 120), Vector2(220, 96), Vector2(300, 390),
-		Vector2(650, 104), Vector2(760, 360), Vector2(850, 164)
+		Vector2i(176, 120), Vector2i(224, 96), Vector2i(304, 400),
+		Vector2i(656, 112), Vector2i(768, 368), Vector2i(848, 160)
 	]:
-		draw_circle(point, 10.0, Color("5f823e"))
-		draw_circle(point + Vector2(4, -2), 2.0, Color("e6d38d"))
+		_draw_tile(10, point)
 
-	# Rock clusters matching collision areas.
-	_draw_rock(Vector2(246, 330), Vector2(92, 58))
-	_draw_rock(Vector2(696, 334), Vector2(112, 64))
+	for point in [Vector2i(256, 336), Vector2i(288, 352), Vector2i(704, 336), Vector2i(752, 352)]:
+		_draw_tile(11, point)
 
-	# West gate markers.
-	draw_rect(Rect2(0, 214, 18, 112), Color("5e4a34"))
-	draw_rect(Rect2(32, 214, 18, 112), Color("5e4a34"))
+	for point in [Vector2i(160, 352), Vector2i(624, 112), Vector2i(848, 400)]:
+		_draw_tile(9, point)
+
+	for point in [Vector2i(0, 224), Vector2i(32, 224)]:
+		for y in range(0, 96, 16):
+			_draw_tile(12, point + Vector2i(0, y))
 
 
-func _draw_rock(position: Vector2, size: Vector2) -> void:
-	draw_rect(Rect2(position, size), Color("6f7168"))
-	draw_rect(Rect2(position + Vector2(8, 8), size - Vector2(16, 16)), Color("85877d"))
+func _fill_tiles(rect: Rect2i, tile_index: int) -> void:
+	var start_x := int(floor(float(rect.position.x) / TILE_SIZE) * TILE_SIZE)
+	var start_y := int(floor(float(rect.position.y) / TILE_SIZE) * TILE_SIZE)
+	for y in range(start_y, rect.end.y, TILE_SIZE):
+		for x in range(start_x, rect.end.x, TILE_SIZE):
+			_draw_tile(tile_index, Vector2i(x, y))
+
+
+func _draw_tile(tile_index: int, position: Vector2i) -> void:
+	var source := Rect2((tile_index % 8) * TILE_SIZE, (tile_index / 8) * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+	draw_texture_rect_region(TILES, Rect2(position.x, position.y, TILE_SIZE, TILE_SIZE), source)
