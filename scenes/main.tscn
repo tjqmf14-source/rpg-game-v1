@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="2_player"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/interaction/interactable_npc.gd" id="4_npc"]
 [ext_resource type="Script" path="res://scripts/ui/dialogue_box.gd" id="5_dialogue"]
 [ext_resource type="Script" path="res://scripts/combat/enemy_controller.gd" id="6_enemy"]
+[ext_resource type="Script" path="res://scripts/ui/collection_panel.gd" id="7_collection"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
 size = Vector2(10, 10)
@@ -51,9 +52,29 @@ collision_mask = 0
 monitoring = false
 script = ExtResource("4_npc")
 speaker_name = "로완"
-dialogue_text = "동쪽 초원에 마물이 나타났네. 공격은 J 또는 마우스 왼쪽, 회피는 K 또는 Space로 해보게."
+dialogue_text = "함께 싸우지. 숫자키로 나를 전면에 세울 수 있네. 이 검도 받아두게."
+unlock_hero_id = "rowan_knight"
+reward_item_id = "traveler_sword"
+reward_once_flag = "recruit_rowan"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GuideNPC"]
+position = Vector2(0, 2)
+shape = SubResource("RectangleShape2D_npc")
+
+
+[node name="MiraNPC" type="Area2D" parent="."]
+position = Vector2(176, 184)
+collision_layer = 2
+collision_mask = 0
+monitoring = false
+script = ExtResource("4_npc")
+speaker_name = "미라"
+dialogue_text = "고대의 파편을 조사하고 있었어. 나도 동행할게. 이 수호복은 챙겨 둬."
+unlock_hero_id = "mira_apprentice"
+reward_item_id = "leather_guard"
+reward_once_flag = "recruit_mira"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MiraNPC"]
 position = Vector2(0, 2)
 shape = SubResource("RectangleShape2D_npc")
 
@@ -122,7 +143,7 @@ offset_bottom = 56.0
 text = "RELIC BOUND"
 
 [node name="Help" type="Label" parent="UI/Margin/VBox"]
-text = "Move WASD | Attack J/LMB | Dodge K/Space | Interact E | Save F5 | Load F9"
+text = "WASD Move | J Attack | K Dodge | E Talk | 1-4 Hero | P Party | I Bag | C Codex"
 
 [node name="Toast" type="Label" parent="UI"]
 visible = false
@@ -132,6 +153,36 @@ offset_right = 295.0
 offset_bottom = 96.0
 text = "Saved"
 horizontal_alignment = 1
+
+
+[node name="CollectionPanel" type="PanelContainer" parent="UI"]
+visible = false
+offset_left = 40.0
+offset_top = 52.0
+offset_right = 440.0
+offset_bottom = 240.0
+script = ExtResource("7_collection")
+
+[node name="Margin" type="MarginContainer" parent="UI/CollectionPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="UI/CollectionPanel/Margin"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="UI/CollectionPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "PARTY / HEROES"
+
+[node name="Body" type="Label" parent="UI/CollectionPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Collection"
+autowrap_mode = 2
 
 [node name="Dialogue" type="PanelContainer" parent="UI"]
 visible = false

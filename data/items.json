@@ -27,5 +27,22 @@
     "rarity": "common",
     "stack_limit": 1,
     "stats": { "attack": 4 }
+  },
+  {
+    "id": "leather_guard",
+    "name": "가죽 수호복",
+    "type": "armor",
+    "rarity": "common",
+    "stack_limit": 1,
+    "stats": { "defense": 3 }
+  },
+  {
+    "id": "wind_charm",
+    "name": "바람의 부적",
+    "type": "relic",
+    "rarity": "rare",
+    "stack_limit": 1,
+    "stats": { "speed": 5 },
+    "effect": "dodge_cooldown_reduction"
   }
 ]
