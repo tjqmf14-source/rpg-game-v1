@@ -1,0 +1,109 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/start_village.gd" id="1_map"]
+[ext_resource type="Script" path="res://scripts/interaction/interactable_npc.gd" id="2_npc"]
+[ext_resource type="Script" path="res://scripts/world/map_exit.gd" id="3_exit"]
+
+[sub_resource type="RectangleShape2D" id="NpcShape"]
+size = Vector2(12, 12)
+
+[sub_resource type="RectangleShape2D" id="ExitShape"]
+size = Vector2(40, 112)
+
+[sub_resource type="RectangleShape2D" id="HorizontalBoundary"]
+size = Vector2(960, 16)
+
+[sub_resource type="RectangleShape2D" id="VerticalBoundary"]
+size = Vector2(16, 540)
+
+[sub_resource type="RectangleShape2D" id="HouseShape"]
+size = Vector2(152, 104)
+
+[node name="StartVillage" type="Node2D"]
+script = ExtResource("1_map")
+
+[node name="SpawnDefault" type="Marker2D" parent="."]
+position = Vector2(240, 270)
+
+[node name="SpawnFromMeadow" type="Marker2D" parent="."]
+position = Vector2(868, 270)
+
+[node name="Boundaries" type="Node2D" parent="."]
+
+[node name="Top" type="StaticBody2D" parent="Boundaries"]
+position = Vector2(480, -8)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/Top"]
+shape = SubResource("HorizontalBoundary")
+
+[node name="Bottom" type="StaticBody2D" parent="Boundaries"]
+position = Vector2(480, 548)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/Bottom"]
+shape = SubResource("HorizontalBoundary")
+
+[node name="Left" type="StaticBody2D" parent="Boundaries"]
+position = Vector2(-8, 270)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/Left"]
+shape = SubResource("VerticalBoundary")
+
+[node name="Right" type="StaticBody2D" parent="Boundaries"]
+position = Vector2(968, 270)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/Right"]
+shape = SubResource("VerticalBoundary")
+
+[node name="HouseA" type="StaticBody2D" parent="."]
+position = Vector2(192, 138)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HouseA"]
+shape = SubResource("HouseShape")
+
+[node name="HouseB" type="StaticBody2D" parent="."]
+position = Vector2(692, 134)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HouseB"]
+shape = SubResource("HouseShape")
+
+[node name="Rowan" type="Area2D" parent="."]
+position = Vector2(338, 266)
+collision_layer = 2
+collision_mask = 0
+monitoring = false
+script = ExtResource("2_npc")
+speaker_name = "로완"
+dialogue_text = "동쪽 초원으로 향하는 길을 함께 지키지. 이 검도 받아두게."
+unlock_hero_id = "rowan_knight"
+reward_item_id = "traveler_sword"
+reward_once_flag = "recruit_rowan"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rowan"]
+shape = SubResource("NpcShape")
+
+[node name="Mira" type="Area2D" parent="."]
+position = Vector2(250, 330)
+collision_layer = 2
+collision_mask = 0
+monitoring = false
+script = ExtResource("2_npc")
+speaker_name = "미라"
+dialogue_text = "초원 너머의 파편을 조사하고 싶어. 나도 동행할게."
+unlock_hero_id = "mira_apprentice"
+reward_item_id = "leather_guard"
+reward_once_flag = "recruit_mira"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mira"]
+shape = SubResource("NpcShape")
+
+[node name="ExitToMeadow" type="Area2D" parent="."]
+position = Vector2(924, 270)
+collision_layer = 0
+collision_mask = 1
+monitoring = true
+script = ExtResource("3_exit")
+target_map_id = "meadow"
+target_spawn = "SpawnFromVillage"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ExitToMeadow"]
+shape = SubResource("ExitShape")
