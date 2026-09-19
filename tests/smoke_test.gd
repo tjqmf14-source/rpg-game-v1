@@ -3,7 +3,7 @@ extends SceneTree
 var failures: Array[String] = []
 
 
-func _initialize() -> void:
+func _init() -> void:
 	_check_required_file("res://project.godot")
 	_check_required_file("res://scenes/main.tscn")
 	_check_json_array("res://data/heroes.json")
