@@ -3,6 +3,9 @@ class_name MapExit
 
 @export var target_map_id: String = ""
 @export var target_spawn: String = "SpawnDefault"
+@export var required_flag: String = ""
+@export var locked_speaker: String = "안내"
+@export_multiline var locked_message: String = ""
 
 var triggered: bool = false
 
@@ -16,6 +19,10 @@ func _on_body_entered(body: Node2D) -> void:
 		return
 	if target_map_id.is_empty():
 		push_error("MapExit: target_map_id is empty")
+		return
+	if not required_flag.is_empty() and not GameState.has_world_flag(required_flag):
+		if not locked_message.is_empty() and not GameState.dialogue_open:
+			GameState.open_dialogue(locked_speaker, locked_message)
 		return
 
 	var game_root := get_tree().get_first_node_in_group("game_root")

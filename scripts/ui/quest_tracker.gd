@@ -1,16 +1,19 @@
 extends Label
 
 const MeadowTrial = preload("res://scripts/quests/meadow_trial.gd")
+const FirstDungeonTrial = preload("res://scripts/quests/first_dungeon_trial.gd")
 
 
 func _process(_delta: float) -> void:
-	var status := MeadowTrial.get_status()
-	match status:
-		"available":
-			visible = false
-		"completed":
-			visible = true
-			text = "초원의 위협  완료"
-		_:
-			visible = true
-			text = MeadowTrial.get_tracker_text()
+	var meadow_status := MeadowTrial.get_status()
+	if meadow_status != "completed":
+		match meadow_status:
+			"available":
+				visible = false
+			_:
+				visible = true
+				text = MeadowTrial.get_tracker_text()
+		return
+
+	visible = true
+	text = FirstDungeonTrial.get_tracker_text()

@@ -47,7 +47,9 @@
     "type": "weapon",
     "rarity": "common",
     "stack_limit": 1,
-    "stats": { "attack": 4 }
+    "stats": {
+      "attack": 4
+    }
   },
   {
     "id": "leather_guard",
@@ -55,7 +57,9 @@
     "type": "armor",
     "rarity": "common",
     "stack_limit": 1,
-    "stats": { "defense": 3 }
+    "stats": {
+      "defense": 3
+    }
   },
   {
     "id": "wind_charm",
@@ -63,7 +67,21 @@
     "type": "relic",
     "rarity": "rare",
     "stack_limit": 1,
-    "stats": { "speed": 5 },
+    "stats": {
+      "speed": 5
+    },
     "effect": "dodge_cooldown_reduction"
+  },
+  {
+    "id": "warden_core",
+    "name": "수호자의 핵",
+    "type": "relic",
+    "rarity": "rare",
+    "stack_limit": 1,
+    "stats": {
+      "attack": 3,
+      "defense": 3
+    },
+    "effect": "boss_trophy"
   }
 ]

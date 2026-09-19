@@ -1,0 +1,175 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/first_dungeon.gd" id="1_map"]
+[ext_resource type="Script" path="res://scripts/world/map_exit.gd" id="2_exit"]
+[ext_resource type="Script" path="res://scripts/combat/enemy_controller.gd" id="3_enemy"]
+[ext_resource type="Script" path="res://scripts/combat/hurtbox.gd" id="4_hurtbox"]
+
+[sub_resource type="RectangleShape2D" id="ExitShape"]
+size = Vector2(48, 112)
+
+[sub_resource type="RectangleShape2D" id="HorizontalBoundary"]
+size = Vector2(960, 32)
+
+[sub_resource type="RectangleShape2D" id="VerticalBoundary"]
+size = Vector2(32, 540)
+
+[sub_resource type="RectangleShape2D" id="EnemyShape"]
+size = Vector2(12, 10)
+
+[sub_resource type="RectangleShape2D" id="BossShape"]
+size = Vector2(22, 20)
+
+[sub_resource type="RectangleShape2D" id="PillarShape"]
+size = Vector2(96, 72)
+
+[node name="FirstDungeon" type="Node2D"]
+script = ExtResource("1_map")
+
+[node name="SpawnDefault" type="Marker2D" parent="."]
+position = Vector2(88, 270)
+
+[node name="SpawnFromMeadow" type="Marker2D" parent="."]
+position = Vector2(88, 270)
+
+[node name="Boundaries" type="Node2D" parent="."]
+
+[node name="Top" type="StaticBody2D" parent="Boundaries"]
+position = Vector2(480, 16)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/Top"]
+shape = SubResource("HorizontalBoundary")
+
+[node name="Bottom" type="StaticBody2D" parent="Boundaries"]
+position = Vector2(480, 524)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/Bottom"]
+shape = SubResource("HorizontalBoundary")
+
+[node name="Left" type="StaticBody2D" parent="Boundaries"]
+position = Vector2(16, 270)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/Left"]
+shape = SubResource("VerticalBoundary")
+
+[node name="Right" type="StaticBody2D" parent="Boundaries"]
+position = Vector2(944, 270)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/Right"]
+shape = SubResource("VerticalBoundary")
+
+[node name="PillarA" type="StaticBody2D" parent="."]
+position = Vector2(256, 200)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PillarA"]
+shape = SubResource("PillarShape")
+
+[node name="PillarB" type="StaticBody2D" parent="."]
+position = Vector2(488, 340)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PillarB"]
+shape = SubResource("PillarShape")
+
+[node name="ExitToMeadow" type="Area2D" parent="."]
+position = Vector2(48, 270)
+collision_layer = 0
+collision_mask = 1
+monitoring = true
+script = ExtResource("2_exit")
+target_map_id = "meadow"
+target_spawn = "SpawnFromDungeon"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ExitToMeadow"]
+shape = SubResource("ExitShape")
+
+[node name="SkeletonA" type="CharacterBody2D" parent="."]
+position = Vector2(330, 150)
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("3_enemy")
+monster_id = "restless_skeleton"
+max_hp = 68
+move_speed = 32.0
+contact_damage = 11
+xp_reward = 28
+gold_reward = 7
+item_drop_id = "old_bone"
+item_drop_chance = 1.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SkeletonA"]
+shape = SubResource("EnemyShape")
+
+[node name="Hurtbox" type="Area2D" parent="SkeletonA"]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+monitorable = true
+script = ExtResource("4_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SkeletonA/Hurtbox"]
+shape = SubResource("EnemyShape")
+
+[node name="GoblinA" type="CharacterBody2D" parent="."]
+position = Vector2(590, 380)
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("3_enemy")
+monster_id = "goblin_scout"
+max_hp = 62
+move_speed = 38.0
+contact_damage = 10
+xp_reward = 24
+gold_reward = 6
+item_drop_id = "iron_scrap"
+item_drop_chance = 1.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GoblinA"]
+shape = SubResource("EnemyShape")
+
+[node name="Hurtbox" type="Area2D" parent="GoblinA"]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+monitorable = true
+script = ExtResource("4_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GoblinA/Hurtbox"]
+shape = SubResource("EnemyShape")
+
+[node name="AncientWarden" type="CharacterBody2D" parent="."]
+position = Vector2(820, 270)
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("3_enemy")
+monster_id = "ancient_warden"
+max_hp = 240
+move_speed = 31.0
+contact_damage = 16
+aggro_range = 190.0
+attack_range = 21.0
+attack_hitbox_radius = 17.0
+attack_cooldown = 0.82
+xp_reward = 120
+gold_reward = 50
+boss_mode = true
+use_visual_row_override = true
+visual_row_override = 2
+visual_scale = 1.75
+phase_two_hp_ratio = 0.5
+phase_two_speed_multiplier = 1.4
+phase_two_cooldown_multiplier = 0.68
+defeat_flag = "boss_ancient_warden_defeated"
+guaranteed_reward_item_id = "warden_core"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AncientWarden"]
+shape = SubResource("BossShape")
+
+[node name="Hurtbox" type="Area2D" parent="AncientWarden"]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+monitorable = true
+script = ExtResource("4_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AncientWarden/Hurtbox"]
+shape = SubResource("BossShape")

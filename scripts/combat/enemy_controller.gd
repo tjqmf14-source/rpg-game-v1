@@ -17,6 +17,15 @@ const FRAME_SIZE := Vector2i(16, 16)
 @export var gold_reward: int = 2
 @export var item_drop_id: String = ""
 @export_range(0.0, 1.0, 0.05) var item_drop_chance: float = 0.0
+@export var boss_mode: bool = false
+@export_range(0, 2, 1) var visual_row_override: int = 0
+@export var use_visual_row_override: bool = false
+@export var visual_scale: float = 1.0
+@export_range(0.1, 0.9, 0.05) var phase_two_hp_ratio: float = 0.5
+@export var phase_two_speed_multiplier: float = 1.35
+@export var phase_two_cooldown_multiplier: float = 0.72
+@export var defeat_flag: String = ""
+@export var guaranteed_reward_item_id: String = ""
 
 var hp: int
 var target: Node2D
@@ -25,10 +34,15 @@ var hurt_flash_left: float = 0.0
 var animation_clock: float = 0.0
 var animation_frame: int = 0
 var visual: Sprite2D
+var base_move_speed: float = 0.0
+var base_attack_cooldown: float = 0.0
+var phase_two_active: bool = false
 
 
 func _ready() -> void:
 	hp = max_hp
+	base_move_speed = move_speed
+	base_attack_cooldown = attack_cooldown
 	add_to_group("enemies")
 	target = get_tree().get_first_node_in_group("player") as Node2D
 	_ensure_visual()
@@ -46,7 +60,7 @@ func _physics_process(delta: float) -> void:
 	if hurt_flash_left > 0.0:
 		hurt_flash_left = maxf(0.0, hurt_flash_left - delta)
 		if visual != null and hurt_flash_left <= 0.0:
-			visual.modulate = Color.WHITE
+			visual.modulate = _boss_visual_tint()
 
 	if GameState.dialogue_open or GameState.menu_open:
 		velocity = Vector2.ZERO
@@ -107,6 +121,7 @@ func take_damage(amount: int, _source: Node = null) -> void:
 		return
 	hp = maxi(0, hp - amount)
 	hurt_flash_left = 0.1
+	_update_boss_phase()
 	if visual != null:
 		visual.modulate = Color("ffd0c9")
 	if hp == 0:
@@ -119,6 +134,10 @@ func _die() -> void:
 	GameState.add_gold(gold_reward)
 	if not item_drop_id.is_empty() and randf() <= item_drop_chance:
 		GameState.add_item(item_drop_id, 1)
+	if not guaranteed_reward_item_id.is_empty():
+		GameState.add_item(guaranteed_reward_item_id, 1)
+	if not defeat_flag.is_empty():
+		GameState.claim_world_flag(defeat_flag)
 	queue_free()
 
 
@@ -132,9 +151,13 @@ func _ensure_visual() -> void:
 	visual.region_enabled = true
 	visual.centered = true
 	visual.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	visual.scale = Vector2.ONE * visual_scale
+	visual.modulate = _boss_visual_tint()
 
 
 func _monster_row() -> int:
+	if use_visual_row_override:
+		return clampi(visual_row_override, 0, 2)
 	match monster_id:
 		"goblin_scout":
 			return 1
@@ -153,3 +176,24 @@ func _update_visual_frame() -> void:
 		FRAME_SIZE.x,
 		FRAME_SIZE.y
 	)
+
+
+func _update_boss_phase() -> void:
+	if not boss_mode or phase_two_active or hp <= 0:
+		return
+	var hp_ratio := float(hp) / float(maxi(max_hp, 1))
+	if hp_ratio > phase_two_hp_ratio:
+		return
+	phase_two_active = true
+	move_speed = base_move_speed * phase_two_speed_multiplier
+	attack_cooldown = maxf(0.2, base_attack_cooldown * phase_two_cooldown_multiplier)
+	if visual != null:
+		visual.modulate = _boss_visual_tint()
+
+
+func _boss_visual_tint() -> Color:
+	if not boss_mode:
+		return Color.WHITE
+	if phase_two_active:
+		return Color("ffb18f")
+	return Color("c7b8ff")

@@ -29,6 +29,9 @@ position = Vector2(72, 270)
 [node name="SpawnFromVillage" type="Marker2D" parent="."]
 position = Vector2(72, 270)
 
+[node name="SpawnFromDungeon" type="Marker2D" parent="."]
+position = Vector2(858, 96)
+
 [node name="Boundaries" type="Node2D" parent="."]
 
 [node name="Top" type="StaticBody2D" parent="Boundaries"]
@@ -159,3 +162,19 @@ script = ExtResource("4_hurtbox")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Skeleton/Hurtbox"]
 shape = SubResource("EnemyShape")
+
+
+[node name="ExitToDungeon" type="Area2D" parent="."]
+position = Vector2(920, 96)
+collision_layer = 0
+collision_mask = 1
+monitoring = true
+script = ExtResource("2_exit")
+target_map_id = "first_dungeon"
+target_spawn = "SpawnFromMeadow"
+required_flag = "quest_meadow_trial_completed"
+locked_speaker = "동쪽 폐허"
+locked_message = "촌장 아델의 초원 의뢰를 마친 뒤 안쪽을 조사하는 편이 좋겠다."
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ExitToDungeon"]
+shape = SubResource("ExitShape")

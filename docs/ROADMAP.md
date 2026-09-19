@@ -27,7 +27,7 @@
 - [x] 드롭
 - [x] 경험치 / 레벨
 - [ ] 실제 hitbox/hurtbox
-- [ ] 첫 보스
+- [x] 첫 보스
 
 ## V0.4 — Collection RPG Prototype
 
@@ -67,7 +67,7 @@
 - [x] 적 4프레임 애니메이션 V1
 - [x] hitbox / hurtbox 전투
 - [x] 첫 퀘스트
-- [ ] 첫 던전
+- [x] 첫 던전
 - [ ] 첫 보스
 - [x] Windows export 자동화
 - [ ] 실플레이 검수
@@ -97,3 +97,14 @@ Vertical Slice 검증 후에만 확장합니다.
 - 플레이타임 약 4~6시간
 
 단, Vertical Slice의 안정성과 재미가 확인된 후 콘텐츠를 확대합니다.
+
+
+## V0.5.0 — First Dungeon
+- [x] 초원 퀘스트 완료 후 던전 입장
+- [x] 던전 독립 씬 / 충돌 / 스폰 / 복귀 동선
+- [x] 고대 수호자 보스
+- [x] 보스 HP 50% 이하 2페이즈
+- [x] 보스 처치 저장 플래그
+- [x] 재입장 시 보스 재생성 방지
+- [x] 수호자의 핵 1회성 보상
+- [x] Dungeon runtime CI

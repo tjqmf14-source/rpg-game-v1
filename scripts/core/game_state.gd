@@ -193,6 +193,13 @@ func get_monster_defeats(monster_id: String) -> int:
 	return int(monster_codex.get(monster_id, 0))
 
 
+func has_world_flag(flag_id: String) -> bool:
+	if flag_id.is_empty():
+		return true
+	var flags: Dictionary = world_state.get("flags", {})
+	return bool(flags.get(flag_id, false))
+
+
 func claim_world_flag(flag_id: String) -> bool:
 	if flag_id.is_empty():
 		return true

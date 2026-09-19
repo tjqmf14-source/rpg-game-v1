@@ -48,3 +48,6 @@ jobs:
 
       - name: Combat runtime test
         run: godot --headless --path . res://tests/combat_runtime_runner.tscn
+
+      - name: Dungeon runtime test
+        run: godot --headless --path . res://tests/dungeon_runtime_runner.tscn

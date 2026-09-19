@@ -5,8 +5,16 @@
     "family": "slime",
     "element": "nature",
     "level": 1,
-    "base_stats": { "hp": 36, "attack": 6, "defense": 2, "speed": 35 },
-    "drops": ["green_gel", "wild_herb"]
+    "base_stats": {
+      "hp": 36,
+      "attack": 6,
+      "defense": 2,
+      "speed": 35
+    },
+    "drops": [
+      "green_gel",
+      "wild_herb"
+    ]
   },
   {
     "id": "goblin_scout",
@@ -14,8 +22,16 @@
     "family": "goblin",
     "element": "neutral",
     "level": 2,
-    "base_stats": { "hp": 52, "attack": 9, "defense": 4, "speed": 55 },
-    "drops": ["worn_coin", "iron_scrap"]
+    "base_stats": {
+      "hp": 52,
+      "attack": 9,
+      "defense": 4,
+      "speed": 55
+    },
+    "drops": [
+      "worn_coin",
+      "iron_scrap"
+    ]
   },
   {
     "id": "restless_skeleton",
@@ -23,7 +39,31 @@
     "family": "undead",
     "element": "dark",
     "level": 3,
-    "base_stats": { "hp": 60, "attack": 11, "defense": 5, "speed": 42 },
-    "drops": ["old_bone", "ancient_shard"]
+    "base_stats": {
+      "hp": 60,
+      "attack": 11,
+      "defense": 5,
+      "speed": 42
+    },
+    "drops": [
+      "old_bone",
+      "ancient_shard"
+    ]
+  },
+  {
+    "id": "ancient_warden",
+    "name": "고대 수호자",
+    "family": "guardian",
+    "element": "dark",
+    "level": 5,
+    "base_stats": {
+      "hp": 240,
+      "attack": 16,
+      "defense": 10,
+      "speed": 31
+    },
+    "drops": [
+      "warden_core"
+    ]
   }
 ]

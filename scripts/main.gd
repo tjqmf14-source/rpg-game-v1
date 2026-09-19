@@ -2,7 +2,8 @@ extends Node2D
 
 const MAP_SCENES := {
 	"start_village": "res://scenes/world/start_village.tscn",
-	"meadow": "res://scenes/world/meadow.tscn"
+	"meadow": "res://scenes/world/meadow.tscn",
+	"first_dungeon": "res://scenes/world/first_dungeon.tscn"
 }
 
 @onready var world_root: Node2D = $WorldRoot
