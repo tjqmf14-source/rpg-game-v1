@@ -1,12 +1,15 @@
 extends CharacterBody2D
 class_name EnemyController
 
+const PLAYER_HURTBOX_MASK := 8
+
 @export var monster_id: String = "meadow_slime"
 @export var max_hp: int = 36
 @export var move_speed: float = 30.0
 @export var contact_damage: int = 6
 @export var aggro_range: float = 96.0
 @export var attack_range: float = 15.0
+@export var attack_hitbox_radius: float = 12.0
 @export var attack_cooldown: float = 0.85
 @export var xp_reward: int = 10
 @export var gold_reward: int = 2
@@ -33,7 +36,7 @@ func _physics_process(delta: float) -> void:
 		hurt_flash_left = maxf(0.0, hurt_flash_left - delta)
 		queue_redraw()
 
-	if GameState.dialogue_open:
+	if GameState.dialogue_open or GameState.menu_open:
 		velocity = Vector2.ZERO
 		move_and_slide()
 		return
@@ -59,9 +62,33 @@ func _physics_process(delta: float) -> void:
 	velocity = Vector2.ZERO
 	move_and_slide()
 
-	if attack_cooldown_left <= 0.0 and target.has_method("take_damage"):
-		target.call("take_damage", contact_damage, self)
+	if attack_cooldown_left <= 0.0:
+		_try_attack(offset)
 		attack_cooldown_left = attack_cooldown
+
+
+func _try_attack(offset_to_player: Vector2) -> void:
+	var shape := CircleShape2D.new()
+	shape.radius = attack_hitbox_radius
+
+	var direction := Vector2.DOWN
+	if offset_to_player.length_squared() > 0.001:
+		direction = offset_to_player.normalized()
+
+	var query := PhysicsShapeQueryParameters2D.new()
+	query.shape = shape
+	query.transform = Transform2D(0.0, global_position + direction * 6.0)
+	query.collision_mask = PLAYER_HURTBOX_MASK
+	query.collide_with_areas = true
+	query.collide_with_bodies = false
+
+	var hits := get_world_2d().direct_space_state.intersect_shape(query, 4)
+	for hit in hits:
+		var hurtbox := hit.get("collider") as Area2D
+		if hurtbox == null or not hurtbox.has_method("receive_damage"):
+			continue
+		hurtbox.call("receive_damage", contact_damage, self)
+		return
 
 
 func take_damage(amount: int, _source: Node = null) -> void:
