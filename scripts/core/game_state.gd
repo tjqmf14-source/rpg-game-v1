@@ -5,6 +5,10 @@ signal hero_unlocked(hero_id: String)
 signal inventory_changed(item_id: String, new_amount: int)
 signal dialogue_opened(speaker: String, text: String)
 signal dialogue_closed
+signal player_hp_changed(current_hp: int, max_hp: int)
+signal experience_changed(current_xp: int, next_xp: int)
+signal player_leveled_up(new_level: int)
+signal player_defeated
 
 var gold: int = 0
 var unlocked_heroes: Array[String] = ["wanderer"]
@@ -17,6 +21,12 @@ var world_state: Dictionary = {
 }
 
 var dialogue_open: bool = false
+
+var player_level: int = 1
+var experience: int = 0
+var experience_to_next: int = 50
+var player_max_hp: int = 120
+var player_hp: int = 120
 
 
 func add_gold(amount: int) -> void:
@@ -53,6 +63,50 @@ func get_item_amount(item_id: String) -> int:
 	return int(inventory.get(item_id, 0))
 
 
+func add_experience(amount: int) -> void:
+	if amount <= 0:
+		return
+
+	experience += amount
+	while experience >= experience_to_next:
+		experience -= experience_to_next
+		player_level += 1
+		experience_to_next = 50 + (player_level - 1) * 25
+		player_max_hp += 10
+		player_hp = player_max_hp
+		player_leveled_up.emit(player_level)
+		player_hp_changed.emit(player_hp, player_max_hp)
+
+	experience_changed.emit(experience, experience_to_next)
+
+
+func damage_player(amount: int) -> bool:
+	if amount <= 0 or player_hp <= 0:
+		return false
+
+	player_hp = maxi(0, player_hp - amount)
+	player_hp_changed.emit(player_hp, player_max_hp)
+
+	if player_hp == 0:
+		player_defeated.emit()
+		return true
+
+	return false
+
+
+func heal_player(amount: int) -> void:
+	if amount <= 0 or player_hp <= 0:
+		return
+
+	player_hp = mini(player_max_hp, player_hp + amount)
+	player_hp_changed.emit(player_hp, player_max_hp)
+
+
+func respawn_player() -> void:
+	player_hp = player_max_hp
+	player_hp_changed.emit(player_hp, player_max_hp)
+
+
 func open_dialogue(speaker: String, text: String) -> void:
 	dialogue_open = true
 	dialogue_opened.emit(speaker, text)
@@ -79,12 +133,17 @@ func get_player_position() -> Vector2:
 
 func to_save_dict() -> Dictionary:
 	return {
-		"version": 1,
+		"version": 2,
 		"gold": gold,
 		"unlocked_heroes": unlocked_heroes,
 		"current_party": current_party,
 		"inventory": inventory,
-		"world_state": world_state
+		"world_state": world_state,
+		"player_level": player_level,
+		"experience": experience,
+		"experience_to_next": experience_to_next,
+		"player_max_hp": player_max_hp,
+		"player_hp": player_hp
 	}
 
 
@@ -106,5 +165,13 @@ func load_from_dict(data: Dictionary) -> void:
 	inventory = Dictionary(data.get("inventory", {})).duplicate(true)
 	world_state = Dictionary(data.get("world_state", {})).duplicate(true)
 
+	player_level = maxi(1, int(data.get("player_level", 1)))
+	experience = maxi(0, int(data.get("experience", 0)))
+	experience_to_next = maxi(1, int(data.get("experience_to_next", 50)))
+	player_max_hp = maxi(1, int(data.get("player_max_hp", 120)))
+	player_hp = clampi(int(data.get("player_hp", player_max_hp)), 1, player_max_hp)
+
 	dialogue_open = false
 	gold_changed.emit(gold)
+	player_hp_changed.emit(player_hp, player_max_hp)
+	experience_changed.emit(experience, experience_to_next)

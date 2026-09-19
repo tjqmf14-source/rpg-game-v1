@@ -10,6 +10,7 @@ func _init() -> void:
 	_check_required_file("res://scripts/interaction/interaction_sensor.gd")
 	_check_required_file("res://scripts/interaction/interactable_npc.gd")
 	_check_required_file("res://scripts/ui/dialogue_box.gd")
+	_check_required_file("res://scripts/combat/enemy_controller.gd")
 	_check_json_array("res://data/heroes.json")
 	_check_json_array("res://data/monsters.json")
 	_check_json_array("res://data/items.json")
