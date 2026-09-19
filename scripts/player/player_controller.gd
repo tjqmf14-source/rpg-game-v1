@@ -163,7 +163,7 @@ func take_damage(amount: int, _source: Node = null) -> void:
 func _on_player_defeated() -> void:
 	var game_root := get_tree().get_first_node_in_group("game_root")
 	if game_root != null and game_root.has_method("respawn_player"):
-		game_root.call("respawn_player")
+		game_root.call_deferred("respawn_player")
 	else:
 		GameState.respawn_player()
 
