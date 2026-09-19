@@ -1,8 +1,9 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/meadow.gd" id="1_map"]
 [ext_resource type="Script" path="res://scripts/world/map_exit.gd" id="2_exit"]
 [ext_resource type="Script" path="res://scripts/combat/enemy_controller.gd" id="3_enemy"]
+[ext_resource type="Script" path="res://scripts/combat/hurtbox.gd" id="4_hurtbox"]
 
 [sub_resource type="RectangleShape2D" id="ExitShape"]
 size = Vector2(40, 112)
@@ -81,7 +82,7 @@ shape = SubResource("ExitShape")
 [node name="Slime" type="CharacterBody2D" parent="."]
 position = Vector2(280, 196)
 collision_layer = 4
-collision_mask = 0
+collision_mask = 1
 script = ExtResource("3_enemy")
 monster_id = "meadow_slime"
 max_hp = 36
@@ -95,10 +96,20 @@ item_drop_chance = 1.0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Slime"]
 shape = SubResource("EnemyShape")
 
+[node name="Hurtbox" type="Area2D" parent="Slime"]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+monitorable = true
+script = ExtResource("4_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Slime/Hurtbox"]
+shape = SubResource("EnemyShape")
+
 [node name="Goblin" type="CharacterBody2D" parent="."]
 position = Vector2(624, 286)
 collision_layer = 4
-collision_mask = 0
+collision_mask = 1
 script = ExtResource("3_enemy")
 monster_id = "goblin_scout"
 max_hp = 52
@@ -112,10 +123,20 @@ item_drop_chance = 0.8
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Goblin"]
 shape = SubResource("EnemyShape")
 
+[node name="Hurtbox" type="Area2D" parent="Goblin"]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+monitorable = true
+script = ExtResource("4_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Goblin/Hurtbox"]
+shape = SubResource("EnemyShape")
+
 [node name="Skeleton" type="CharacterBody2D" parent="."]
 position = Vector2(806, 176)
 collision_layer = 4
-collision_mask = 0
+collision_mask = 1
 script = ExtResource("3_enemy")
 monster_id = "restless_skeleton"
 max_hp = 60
@@ -127,4 +148,14 @@ item_drop_id = "ancient_shard"
 item_drop_chance = 0.5
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Skeleton"]
+shape = SubResource("EnemyShape")
+
+[node name="Hurtbox" type="Area2D" parent="Skeleton"]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+monitorable = true
+script = ExtResource("4_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Skeleton/Hurtbox"]
 shape = SubResource("EnemyShape")
