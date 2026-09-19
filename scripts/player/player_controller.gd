@@ -35,7 +35,7 @@ func _physics_process(delta: float) -> void:
 		attack_visual_left = maxf(0.0, attack_visual_left - delta)
 		queue_redraw()
 
-	if GameState.dialogue_open:
+	if GameState.dialogue_open or GameState.menu_open:
 		velocity = Vector2.ZERO
 		move_and_slide()
 		return
@@ -69,7 +69,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if GameState.dialogue_open:
+	if GameState.dialogue_open or GameState.menu_open:
 		return
 
 	if event is InputEventMouseButton:
