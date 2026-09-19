@@ -22,7 +22,7 @@ func _reset_state() -> void:
 		"monster_codex": {},
 		"equipment": {},
 		"world_state": {
-			"map_id": "bootstrap_meadow",
+			"map_id": "start_village",
 			"player_x": 240.0,
 			"player_y": 135.0,
 			"flags": {}
@@ -97,7 +97,7 @@ func _test_corrupt_save_sanitization() -> void:
 			}
 		},
 		"world_state": {
-			"map_id": "bootstrap_meadow",
+			"map_id": "start_village",
 			"player_x": 999999999.0,
 			"player_y": -999999999.0,
 			"flags": {"valid_flag": true, "false_flag": false}
