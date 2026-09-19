@@ -26,7 +26,7 @@ var equipment: Dictionary = {}
 var world_state: Dictionary = {
 	"map_id": "start_village",
 	"player_x": 240.0,
-	"player_y": 135.0,
+	"player_y": 270.0,
 	"flags": {}
 }
 
@@ -396,7 +396,7 @@ func _sanitize_world_state(raw_value: Variant) -> Dictionary:
 	var result: Dictionary = {
 		"map_id": "start_village",
 		"player_x": 240.0,
-		"player_y": 135.0,
+		"player_y": 270.0,
 		"flags": {}
 	}
 
@@ -406,7 +406,7 @@ func _sanitize_world_state(raw_value: Variant) -> Dictionary:
 	var raw: Dictionary = raw_value
 	result["map_id"] = String(raw.get("map_id", "bootstrap_meadow"))
 	result["player_x"] = clampf(float(raw.get("player_x", 240.0)), -100000.0, 100000.0)
-	result["player_y"] = clampf(float(raw.get("player_y", 135.0)), -100000.0, 100000.0)
+	result["player_y"] = clampf(float(raw.get("player_y", 270.0)), -100000.0, 100000.0)
 
 	var clean_flags: Dictionary = {}
 	var raw_flags = raw.get("flags", {})
