@@ -57,7 +57,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func change_map(map_id: String, spawn_name: String = "SpawnDefault") -> bool:
-	return _load_map(_normalize_map_id(map_id), spawn_name, false)
+	if not MAP_SCENES.has(map_id):
+		push_error("Main: rejected unknown map id: %s" % map_id)
+		return false
+	return _load_map(map_id, spawn_name, false)
 
 
 func get_current_map_id() -> String:
