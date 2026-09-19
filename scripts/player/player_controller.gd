@@ -1,9 +1,12 @@
 extends CharacterBody2D
 class_name PlayerController
 
+const ENEMY_HURTBOX_MASK := 16
+
 @export var move_speed: float = 80.0
 @export var attack_damage: int = 20
-@export var attack_range: float = 26.0
+@export var attack_hitbox_size: Vector2 = Vector2(20, 14)
+@export var attack_offset: float = 14.0
 @export var attack_cooldown: float = 0.35
 @export var dodge_cooldown: float = 0.7
 @export var dodge_duration: float = 0.14
@@ -103,26 +106,33 @@ func _try_attack() -> void:
 	attack_visual_left = 0.12
 	queue_redraw()
 
-	var best_target: Node2D = null
-	var best_distance := INF
+	var shape := RectangleShape2D.new()
+	shape.size = attack_hitbox_size
 
-	for node in get_tree().get_nodes_in_group("enemies"):
-		var enemy := node as Node2D
-		if enemy == null or not is_instance_valid(enemy):
+	var query := PhysicsShapeQueryParameters2D.new()
+	query.shape = shape
+	query.transform = Transform2D(0.0, global_position + facing.normalized() * attack_offset)
+	query.collision_mask = ENEMY_HURTBOX_MASK
+	query.collide_with_areas = true
+	query.collide_with_bodies = false
+
+	var hits := get_world_2d().direct_space_state.intersect_shape(query, 16)
+	var damaged_actor_ids: Dictionary = {}
+
+	for hit in hits:
+		var hurtbox := hit.get("collider") as Area2D
+		if hurtbox == null or not hurtbox.has_method("receive_damage"):
 			continue
 
-		var offset := enemy.global_position - global_position
-		var distance := offset.length()
-		if distance > attack_range or distance <= 0.001:
+		var actor: Node = hurtbox.call("get_actor") if hurtbox.has_method("get_actor") else null
+		if actor == null:
 			continue
-		if facing.dot(offset.normalized()) < 0.15:
-			continue
-		if distance < best_distance:
-			best_distance = distance
-			best_target = enemy
 
-	if best_target != null and best_target.has_method("take_damage"):
-		best_target.call("take_damage", attack_damage, self)
+		var actor_id := actor.get_instance_id()
+		if damaged_actor_ids.has(actor_id):
+			continue
+		damaged_actor_ids[actor_id] = true
+		hurtbox.call("receive_damage", attack_damage, self)
 
 
 func _try_dodge() -> void:
@@ -140,14 +150,22 @@ func _try_dodge() -> void:
 func take_damage(amount: int, _source: Node = null) -> void:
 	if dodge_time_left > 0.0:
 		return
-	GameState.damage_player(amount)
+
+	var hero := GameDatabase.get_hero(active_hero_id)
+	var stats: Dictionary = hero.get("base_stats", {})
+	var defense := int(stats.get("defense", 0)) + GameState.get_equipped_stat_bonus(active_hero_id, "defense")
+	var mitigated_damage := maxi(1, amount - int(floor(float(defense) * 0.25)))
+
+	GameState.damage_player(mitigated_damage)
 	queue_redraw()
 
 
 func _on_player_defeated() -> void:
-	position = Vector2(240, 135)
-	GameState.set_player_position(position)
-	GameState.respawn_player()
+	var game_root := get_tree().get_first_node_in_group("game_root")
+	if game_root != null and game_root.has_method("respawn_player"):
+		game_root.call("respawn_player")
+	else:
+		GameState.respawn_player()
 
 
 func _on_active_hero_changed(_hero_id: String) -> void:
