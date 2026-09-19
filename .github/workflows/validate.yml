@@ -35,10 +35,10 @@ jobs:
         run: godot --headless --path . --editor --quit
 
       - name: Smoke test
-        run: godot --headless --path . --script res://tests/smoke_test.gd
+        run: godot --headless --path . res://tests/smoke_runner.tscn
 
       - name: Data integrity test
         run: godot --headless --path . --script res://tests/data_integrity_test.gd
 
       - name: Gameplay regression test
-        run: godot --headless --path . --script res://tests/gameplay_regression_test.gd
+        run: godot --headless --path . res://tests/gameplay_regression_runner.tscn
