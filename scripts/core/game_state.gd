@@ -1,5 +1,7 @@
 extends Node
 
+const SAVE_VERSION := 3
+
 signal gold_changed(new_value: int)
 signal hero_unlocked(hero_id: String)
 signal inventory_changed(item_id: String, new_amount: int)
@@ -272,7 +274,7 @@ func get_player_position() -> Vector2:
 
 func to_save_dict() -> Dictionary:
 	return {
-		"version": 3,
+		"version": SAVE_VERSION,
 		"gold": gold,
 		"unlocked_heroes": unlocked_heroes,
 		"current_party": current_party,
@@ -290,31 +292,16 @@ func to_save_dict() -> Dictionary:
 
 
 func load_from_dict(data: Dictionary) -> void:
-	gold = int(data.get("gold", 0))
+	gold = maxi(0, int(data.get("gold", 0)))
 
-	unlocked_heroes.clear()
-	for hero_id in data.get("unlocked_heroes", ["wanderer"]):
-		unlocked_heroes.append(String(hero_id))
-	if unlocked_heroes.is_empty():
-		unlocked_heroes.append("wanderer")
-
-	current_party.clear()
-	for hero_id in data.get("current_party", ["wanderer"]):
-		if String(hero_id) in unlocked_heroes:
-			current_party.append(String(hero_id))
-	if current_party.is_empty():
-		current_party.append("wanderer")
-
+	unlocked_heroes = _sanitize_unlocked_heroes(data.get("unlocked_heroes", ["wanderer"]))
+	current_party = _sanitize_party(data.get("current_party", ["wanderer"]))
 	active_party_index = clampi(int(data.get("active_party_index", 0)), 0, current_party.size() - 1)
-	inventory = Dictionary(data.get("inventory", {})).duplicate(true)
-	monster_codex = Dictionary(data.get("monster_codex", {})).duplicate(true)
-	equipment = Dictionary(data.get("equipment", {})).duplicate(true)
-	world_state = Dictionary(data.get("world_state", world_state)).duplicate(true)
-	if not world_state.has("flags"):
-		world_state["flags"] = {}
 
-	for hero_id in unlocked_heroes:
-		_ensure_equipment(hero_id)
+	inventory = _sanitize_inventory(data.get("inventory", {}))
+	monster_codex = _sanitize_monster_codex(data.get("monster_codex", {}))
+	world_state = _sanitize_world_state(data.get("world_state", {}))
+	equipment = _sanitize_equipment(data.get("equipment", {}))
 
 	player_level = maxi(1, int(data.get("player_level", 1)))
 	experience = maxi(0, int(data.get("experience", 0)))
@@ -323,11 +310,165 @@ func load_from_dict(data: Dictionary) -> void:
 	player_hp = clampi(int(data.get("player_hp", player_max_hp)), 1, player_max_hp)
 
 	dialogue_open = false
+	menu_open = false
+
 	gold_changed.emit(gold)
 	player_hp_changed.emit(player_hp, player_max_hp)
 	experience_changed.emit(experience, experience_to_next)
 	party_changed.emit()
 	active_hero_changed.emit(get_active_hero_id())
+
+
+func _sanitize_unlocked_heroes(raw_value: Variant) -> Array[String]:
+	var result: Array[String] = ["wanderer"]
+	if typeof(raw_value) != TYPE_ARRAY:
+		return result
+
+	for raw_id in raw_value:
+		var hero_id := String(raw_id)
+		if hero_id == "wanderer":
+			continue
+		if hero_id in result:
+			continue
+		if GameDatabase.get_hero(hero_id).is_empty():
+			continue
+		result.append(hero_id)
+
+	return result
+
+
+func _sanitize_party(raw_value: Variant) -> Array[String]:
+	var result: Array[String] = []
+	if typeof(raw_value) == TYPE_ARRAY:
+		for raw_id in raw_value:
+			var hero_id := String(raw_id)
+			if hero_id not in unlocked_heroes:
+				continue
+			if hero_id in result:
+				continue
+			result.append(hero_id)
+			if result.size() >= 4:
+				break
+
+	if result.is_empty():
+		result.append("wanderer")
+	return result
+
+
+func _sanitize_inventory(raw_value: Variant) -> Dictionary:
+	var result: Dictionary = {}
+	if typeof(raw_value) != TYPE_DICTIONARY:
+		return result
+
+	var raw: Dictionary = raw_value
+	for raw_id in raw.keys():
+		var item_id := String(raw_id)
+		var amount := int(raw[raw_id])
+		if amount <= 0:
+			continue
+		if GameDatabase.get_item(item_id).is_empty():
+			continue
+		var stack_limit := maxi(1, int(GameDatabase.get_item(item_id).get("stack_limit", 99)))
+		result[item_id] = mini(amount, stack_limit)
+
+	return result
+
+
+func _sanitize_monster_codex(raw_value: Variant) -> Dictionary:
+	var result: Dictionary = {}
+	if typeof(raw_value) != TYPE_DICTIONARY:
+		return result
+
+	var raw: Dictionary = raw_value
+	for raw_id in raw.keys():
+		var monster_id := String(raw_id)
+		var defeats := int(raw[raw_id])
+		if defeats <= 0:
+			continue
+		if GameDatabase.get_monster(monster_id).is_empty():
+			continue
+		result[monster_id] = defeats
+
+	return result
+
+
+func _sanitize_world_state(raw_value: Variant) -> Dictionary:
+	var result: Dictionary = {
+		"map_id": "bootstrap_meadow",
+		"player_x": 240.0,
+		"player_y": 135.0,
+		"flags": {}
+	}
+
+	if typeof(raw_value) != TYPE_DICTIONARY:
+		return result
+
+	var raw: Dictionary = raw_value
+	result["map_id"] = String(raw.get("map_id", "bootstrap_meadow"))
+	result["player_x"] = clampf(float(raw.get("player_x", 240.0)), -100000.0, 100000.0)
+	result["player_y"] = clampf(float(raw.get("player_y", 135.0)), -100000.0, 100000.0)
+
+	var clean_flags: Dictionary = {}
+	var raw_flags = raw.get("flags", {})
+	if typeof(raw_flags) == TYPE_DICTIONARY:
+		for raw_flag in raw_flags.keys():
+			if bool(raw_flags[raw_flag]):
+				clean_flags[String(raw_flag)] = true
+	result["flags"] = clean_flags
+
+	return result
+
+
+func _sanitize_equipment(raw_value: Variant) -> Dictionary:
+	var result: Dictionary = {}
+	var raw: Dictionary = {}
+	if typeof(raw_value) == TYPE_DICTIONARY:
+		raw = raw_value
+
+	for hero_id in unlocked_heroes:
+		var clean: Dictionary = {
+			"weapon": "",
+			"armor": "",
+			"relics": []
+		}
+		var hero_raw: Dictionary = {}
+		if raw.has(hero_id) and typeof(raw[hero_id]) == TYPE_DICTIONARY:
+			hero_raw = raw[hero_id]
+
+		var weapon_id := String(hero_raw.get("weapon", ""))
+		if _is_owned_equipment_type(weapon_id, "weapon"):
+			clean["weapon"] = weapon_id
+
+		var armor_id := String(hero_raw.get("armor", ""))
+		if _is_owned_equipment_type(armor_id, "armor"):
+			clean["armor"] = armor_id
+
+		var relics: Array[String] = []
+		var raw_relics = hero_raw.get("relics", [])
+		if typeof(raw_relics) == TYPE_ARRAY:
+			for raw_relic_id in raw_relics:
+				var relic_id := String(raw_relic_id)
+				if relic_id in relics:
+					continue
+				if not _is_owned_equipment_type(relic_id, "relic"):
+					continue
+				relics.append(relic_id)
+				if relics.size() >= 2:
+					break
+		clean["relics"] = relics
+
+		result[hero_id] = clean
+
+	return result
+
+
+func _is_owned_equipment_type(item_id: String, expected_type: String) -> bool:
+	if item_id.is_empty() or get_item_amount(item_id) <= 0:
+		return false
+	var item := GameDatabase.get_item(item_id)
+	if item.is_empty():
+		return false
+	return String(item.get("type", "")) == expected_type
 
 
 func _ensure_equipment(hero_id: String) -> void:
