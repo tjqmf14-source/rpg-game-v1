@@ -77,6 +77,7 @@ func take_damage(amount: int, _source: Node = null) -> void:
 
 
 func _die() -> void:
+	GameState.record_monster_defeat(monster_id)
 	GameState.add_experience(xp_reward)
 	GameState.add_gold(gold_reward)
 
