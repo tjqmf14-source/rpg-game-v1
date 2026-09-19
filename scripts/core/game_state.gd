@@ -24,7 +24,7 @@ var inventory: Dictionary = {}
 var monster_codex: Dictionary = {}
 var equipment: Dictionary = {}
 var world_state: Dictionary = {
-	"map_id": "bootstrap_meadow",
+	"map_id": "start_village",
 	"player_x": 240.0,
 	"player_y": 135.0,
 	"flags": {}
@@ -394,7 +394,7 @@ func _sanitize_monster_codex(raw_value: Variant) -> Dictionary:
 
 func _sanitize_world_state(raw_value: Variant) -> Dictionary:
 	var result: Dictionary = {
-		"map_id": "bootstrap_meadow",
+		"map_id": "start_village",
 		"player_x": 240.0,
 		"player_y": 135.0,
 		"flags": {}
