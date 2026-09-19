@@ -15,11 +15,11 @@
 
 - [ ] Sunnyside 타일셋 연결
 - [ ] TileMapLayer 기반 필드
-- [ ] 충돌 레이어 규칙
-- [ ] 상호작용 시스템
-- [ ] NPC 대화
+- [x] 충돌 레이어 규칙
+- [x] 상호작용 시스템
+- [x] NPC 대화
 - [ ] 맵 전환
-- [ ] 세이브/로드 V1
+- [x] 세이브/로드 V1
 
 ## V0.3 — Combat Vertical Slice
 
