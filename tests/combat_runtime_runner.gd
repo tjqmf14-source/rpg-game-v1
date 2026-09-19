@@ -51,7 +51,8 @@ func _ready() -> void:
 		_finish()
 		return
 
-	slime.process_mode = Node.PROCESS_MODE_DISABLED
+	slime.set("move_speed", 0.0)
+	slime.set("aggro_range", 0.0)
 	var enemy_hurtbox := slime.get_node_or_null("Hurtbox")
 	var player_hurtbox := player.get_node_or_null("Hurtbox")
 	_expect(enemy_hurtbox != null, "Enemy hurtbox must exist")
