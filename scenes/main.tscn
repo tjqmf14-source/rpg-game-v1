@@ -173,12 +173,12 @@ theme_override_constants/margin_bottom = 8
 [node name="VBox" type="VBoxContainer" parent="UI/CollectionPanel/Margin"]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="UI/CollectionPanel/Margin/VBox"]
+[node name="CollectionTitle" type="Label" parent="UI/CollectionPanel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "PARTY / HEROES"
 
-[node name="Body" type="Label" parent="UI/CollectionPanel/Margin/VBox"]
+[node name="CollectionBody" type="Label" parent="UI/CollectionPanel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Collection"
