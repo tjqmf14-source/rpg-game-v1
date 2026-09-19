@@ -15,7 +15,7 @@
 - [x] NPC 대화
 - [x] 세이브/로드 V1
 - [ ] 실제 TileMapLayer 필드
-- [ ] 맵 전환
+- [x] 맵 전환
 
 ## V0.3 — Combat Prototype
 
@@ -53,8 +53,8 @@
 ## Vertical Slice — 현재 최우선
 
 - [ ] 실제 게임용 16px 에셋 규격 확립
-- [ ] 시작 마을 TileMap
-- [ ] 초원 TileMap
+- [x] 시작 마을 독립 씬/충돌/스폰 기반\n- [ ] 시작 마을 실제 TileMap
+- [x] 초원 독립 씬/충돌/스폰/적 기반\n- [ ] 초원 실제 TileMap
 - [ ] 캐릭터 실제 애니메이션
 - [ ] 적 실제 애니메이션
 - [ ] hitbox / hurtbox 전투
