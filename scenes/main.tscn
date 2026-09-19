@@ -1,10 +1,11 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="2_player"]
 [ext_resource type="Script" path="res://scripts/interaction/interaction_sensor.gd" id="3_sensor"]
 [ext_resource type="Script" path="res://scripts/interaction/interactable_npc.gd" id="4_npc"]
 [ext_resource type="Script" path="res://scripts/ui/dialogue_box.gd" id="5_dialogue"]
+[ext_resource type="Script" path="res://scripts/combat/enemy_controller.gd" id="6_enemy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
 size = Vector2(10, 10)
@@ -14,6 +15,9 @@ radius = 22.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_npc"]
 size = Vector2(12, 12)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_enemy"]
+size = Vector2(12, 10)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -37,7 +41,6 @@ script = ExtResource("3_sensor")
 shape = SubResource("CircleShape2D_interaction")
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
-position = Vector2(0, 0)
 enabled = true
 position_smoothing_enabled = false
 
@@ -48,11 +51,62 @@ collision_mask = 0
 monitoring = false
 script = ExtResource("4_npc")
 speaker_name = "로완"
-dialogue_text = "이 길 끝의 오래된 숲에는 빛나는 파편이 떨어졌다고 해. 준비가 되면 북쪽으로 가 보게."
+dialogue_text = "동쪽 초원에 마물이 나타났네. 공격은 J 또는 마우스 왼쪽, 회피는 K 또는 Space로 해보게."
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GuideNPC"]
 position = Vector2(0, 2)
 shape = SubResource("RectangleShape2D_npc")
+
+[node name="Slime" type="CharacterBody2D" parent="."]
+position = Vector2(360, 100)
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("6_enemy")
+monster_id = "meadow_slime"
+max_hp = 36
+move_speed = 25.0
+contact_damage = 5
+xp_reward = 12
+gold_reward = 2
+item_drop_id = "wild_herb"
+item_drop_chance = 1.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Slime"]
+shape = SubResource("RectangleShape2D_enemy")
+
+[node name="Goblin" type="CharacterBody2D" parent="."]
+position = Vector2(400, 150)
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("6_enemy")
+monster_id = "goblin_scout"
+max_hp = 52
+move_speed = 35.0
+contact_damage = 8
+xp_reward = 18
+gold_reward = 4
+item_drop_id = "iron_scrap"
+item_drop_chance = 0.8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Goblin"]
+shape = SubResource("RectangleShape2D_enemy")
+
+[node name="Skeleton" type="CharacterBody2D" parent="."]
+position = Vector2(390, 220)
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("6_enemy")
+monster_id = "restless_skeleton"
+max_hp = 60
+move_speed = 30.0
+contact_damage = 10
+xp_reward = 24
+gold_reward = 6
+item_drop_id = "ancient_shard"
+item_drop_chance = 0.5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Skeleton"]
+shape = SubResource("RectangleShape2D_enemy")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -68,13 +122,13 @@ offset_bottom = 56.0
 text = "RELIC BOUND"
 
 [node name="Help" type="Label" parent="UI/Margin/VBox"]
-text = "Move: Arrow/WASD  Interact: E  Save: F5  Load: F9"
+text = "Move WASD | Attack J/LMB | Dodge K/Space | Interact E | Save F5 | Load F9"
 
 [node name="Toast" type="Label" parent="UI"]
 visible = false
-offset_left = 208.0
+offset_left = 185.0
 offset_top = 72.0
-offset_right = 272.0
+offset_right = 295.0
 offset_bottom = 96.0
 text = "Saved"
 horizontal_alignment = 1
