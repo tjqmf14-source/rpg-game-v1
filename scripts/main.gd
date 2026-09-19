@@ -92,7 +92,9 @@ func _load_map(map_id: String, spawn_name: String, restore_saved_position: bool)
 		return false
 
 	if current_map != null and is_instance_valid(current_map):
-		current_map.free()
+		var old_map := current_map
+		world_root.remove_child(old_map)
+		old_map.queue_free()
 
 	current_map = next_map
 	world_root.add_child(current_map)
