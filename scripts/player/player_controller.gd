@@ -15,11 +15,15 @@ var attack_visual_left: float = 0.0
 var dodge_cooldown_left: float = 0.0
 var dodge_time_left: float = 0.0
 var dodge_direction: Vector2 = Vector2.DOWN
+var active_hero_id: String = "wanderer"
+var hero_color: Color = Color("d8b56c")
 
 
 func _ready() -> void:
 	add_to_group("player")
 	GameState.player_defeated.connect(_on_player_defeated)
+	GameState.active_hero_changed.connect(_on_active_hero_changed)
+	_apply_active_hero()
 	queue_redraw()
 
 
@@ -85,6 +89,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.keycode == KEY_K or event.keycode == KEY_SPACE:
 		_try_dodge()
 		get_viewport().set_input_as_handled()
+	elif event.keycode >= KEY_1 and event.keycode <= KEY_4:
+		var slot := int(event.keycode - KEY_1)
+		if GameState.set_active_party_slot(slot):
+			get_viewport().set_input_as_handled()
 
 
 func _try_attack() -> void:
@@ -107,10 +115,8 @@ func _try_attack() -> void:
 		var distance := offset.length()
 		if distance > attack_range or distance <= 0.001:
 			continue
-
 		if facing.dot(offset.normalized()) < 0.15:
 			continue
-
 		if distance < best_distance:
 			best_distance = distance
 			best_target = enemy
@@ -144,9 +150,30 @@ func _on_player_defeated() -> void:
 	GameState.respawn_player()
 
 
+func _on_active_hero_changed(_hero_id: String) -> void:
+	_apply_active_hero()
+
+
+func _apply_active_hero() -> void:
+	active_hero_id = GameState.get_active_hero_id()
+	var hero := GameDatabase.get_hero(active_hero_id)
+	var stats: Dictionary = hero.get("base_stats", {})
+	attack_damage = int(stats.get("attack", 16)) + GameState.get_equipped_stat_bonus(active_hero_id, "attack")
+	move_speed = clampf(float(stats.get("speed", 80)), 60.0, 100.0)
+
+	match active_hero_id:
+		"rowan_knight":
+			hero_color = Color("d2d8e2")
+		"mira_apprentice":
+			hero_color = Color("a94b43")
+		_:
+			hero_color = Color("d8b56c")
+
+	queue_redraw()
+
+
 func _draw() -> void:
-	# Temporary 16px-grid character. Replaced by GPT-generated production sprite.
-	draw_rect(Rect2(-6, -7, 12, 13), Color("d8b56c"))
+	draw_rect(Rect2(-6, -7, 12, 13), hero_color)
 	draw_rect(Rect2(-5, -6, 10, 5), Color("e9c98a"))
 	draw_rect(Rect2(-6, -7, 12, 3), Color("4a3428"))
 	draw_rect(Rect2(-5, 6, 4, 2), Color("45352f"))
