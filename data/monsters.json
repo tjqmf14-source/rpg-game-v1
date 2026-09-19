@@ -1,0 +1,29 @@
+[
+  {
+    "id": "meadow_slime",
+    "name": "초원 슬라임",
+    "family": "slime",
+    "element": "nature",
+    "level": 1,
+    "base_stats": { "hp": 36, "attack": 6, "defense": 2, "speed": 35 },
+    "drops": ["green_gel", "wild_herb"]
+  },
+  {
+    "id": "goblin_scout",
+    "name": "고블린 정찰병",
+    "family": "goblin",
+    "element": "neutral",
+    "level": 2,
+    "base_stats": { "hp": 52, "attack": 9, "defense": 4, "speed": 55 },
+    "drops": ["worn_coin", "iron_scrap"]
+  },
+  {
+    "id": "restless_skeleton",
+    "name": "떠도는 해골",
+    "family": "undead",
+    "element": "dark",
+    "level": 3,
+    "base_stats": { "hp": 60, "attack": 11, "defense": 5, "speed": 42 },
+    "drops": ["old_bone", "ancient_shard"]
+  }
+]
