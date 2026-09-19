@@ -2,6 +2,9 @@ extends CharacterBody2D
 class_name PlayerController
 
 const ENEMY_HURTBOX_MASK := 16
+const HERO_SHEET := preload("res://assets/generated/characters/heroes_v1.png")
+const FRAME_SIZE := Vector2i(16, 24)
+const WALK_FRAME_TIME := 0.14
 
 @export var move_speed: float = 80.0
 @export var attack_damage: int = 20
@@ -19,14 +22,18 @@ var dodge_cooldown_left: float = 0.0
 var dodge_time_left: float = 0.0
 var dodge_direction: Vector2 = Vector2.DOWN
 var active_hero_id: String = "wanderer"
-var hero_color: Color = Color("d8b56c")
+var walk_clock: float = 0.0
+var walk_frame: int = 0
+var visual: Sprite2D
 
 
 func _ready() -> void:
 	add_to_group("player")
 	GameState.player_defeated.connect(_on_player_defeated)
 	GameState.active_hero_changed.connect(_on_active_hero_changed)
+	_ensure_visual()
 	_apply_active_hero()
+	_update_visual_frame()
 	queue_redraw()
 
 
@@ -41,12 +48,14 @@ func _physics_process(delta: float) -> void:
 	if GameState.dialogue_open or GameState.menu_open:
 		velocity = Vector2.ZERO
 		move_and_slide()
+		_update_walk_animation(delta, false)
 		return
 
 	if dodge_time_left > 0.0:
 		dodge_time_left = maxf(0.0, dodge_time_left - delta)
 		velocity = dodge_direction * move_speed * dodge_speed_multiplier
 		move_and_slide()
+		_update_walk_animation(delta, true)
 		return
 
 	var input_direction := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
@@ -69,6 +78,7 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector2.ZERO
 
 	move_and_slide()
+	_update_walk_animation(delta, input_direction != Vector2.ZERO)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -123,11 +133,9 @@ func _try_attack() -> void:
 		var hurtbox := hit.get("collider") as Area2D
 		if hurtbox == null or not hurtbox.has_method("receive_damage"):
 			continue
-
 		var actor: Node = hurtbox.call("get_actor") if hurtbox.has_method("get_actor") else null
 		if actor == null:
 			continue
-
 		var actor_id := actor.get_instance_id()
 		if damaged_actor_ids.has(actor_id):
 			continue
@@ -138,11 +146,7 @@ func _try_attack() -> void:
 func _try_dodge() -> void:
 	if dodge_cooldown_left > 0.0 or dodge_time_left > 0.0:
 		return
-
-	dodge_direction = facing
-	if velocity != Vector2.ZERO:
-		dodge_direction = velocity.normalized()
-
+	dodge_direction = facing if velocity == Vector2.ZERO else velocity.normalized()
 	dodge_time_left = dodge_duration
 	dodge_cooldown_left = dodge_cooldown
 
@@ -155,9 +159,14 @@ func take_damage(amount: int, _source: Node = null) -> void:
 	var stats: Dictionary = hero.get("base_stats", {})
 	var defense := int(stats.get("defense", 0)) + GameState.get_equipped_stat_bonus(active_hero_id, "defense")
 	var mitigated_damage := maxi(1, amount - int(floor(float(defense) * 0.25)))
-
 	GameState.damage_player(mitigated_damage)
-	queue_redraw()
+
+	if visual != null:
+		visual.modulate = Color("ffd0c9")
+		get_tree().create_timer(0.08).timeout.connect(func() -> void:
+			if is_instance_valid(visual):
+				visual.modulate = Color.WHITE
+		)
 
 
 func _on_player_defeated() -> void:
@@ -178,29 +187,63 @@ func _apply_active_hero() -> void:
 	var stats: Dictionary = hero.get("base_stats", {})
 	attack_damage = int(stats.get("attack", 16)) + GameState.get_equipped_stat_bonus(active_hero_id, "attack")
 	move_speed = clampf(float(stats.get("speed", 80)), 60.0, 100.0)
+	_update_visual_frame()
 
+
+func _ensure_visual() -> void:
+	visual = get_node_or_null("Visual") as Sprite2D
+	if visual == null:
+		visual = Sprite2D.new()
+		visual.name = "Visual"
+		add_child(visual)
+	visual.texture = HERO_SHEET
+	visual.region_enabled = true
+	visual.centered = true
+	visual.position = Vector2(0, -4)
+	visual.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+
+
+func _update_walk_animation(delta: float, moving: bool) -> void:
+	if moving:
+		walk_clock += delta
+		if walk_clock >= WALK_FRAME_TIME:
+			walk_clock = 0.0
+			walk_frame = 1 if walk_frame == 2 else walk_frame + 1
+	else:
+		walk_clock = 0.0
+		walk_frame = 0
+	_update_visual_frame()
+
+
+func _hero_row() -> int:
 	match active_hero_id:
 		"rowan_knight":
-			hero_color = Color("d2d8e2")
+			return 1
 		"mira_apprentice":
-			hero_color = Color("a94b43")
+			return 2
 		_:
-			hero_color = Color("d8b56c")
+			return 0
 
-	queue_redraw()
+
+func _direction_index() -> int:
+	if absf(facing.x) > absf(facing.y):
+		return 2 if facing.x > 0.0 else 1
+	return 0 if facing.y >= 0.0 else 3
+
+
+func _update_visual_frame() -> void:
+	if visual == null:
+		return
+	var column := _direction_index() * 3 + walk_frame
+	visual.region_rect = Rect2(
+		column * FRAME_SIZE.x,
+		_hero_row() * FRAME_SIZE.y,
+		FRAME_SIZE.x,
+		FRAME_SIZE.y
+	)
 
 
 func _draw() -> void:
-	draw_rect(Rect2(-6, -7, 12, 13), hero_color)
-	draw_rect(Rect2(-5, -6, 10, 5), Color("e9c98a"))
-	draw_rect(Rect2(-6, -7, 12, 3), Color("4a3428"))
-	draw_rect(Rect2(-5, 6, 4, 2), Color("45352f"))
-	draw_rect(Rect2(1, 6, 4, 2), Color("45352f"))
-
-	var eye_offset := Vector2(signf(facing.x) * 2.0, signf(facing.y))
-	draw_rect(Rect2(eye_offset.x - 2, eye_offset.y - 3, 1, 1), Color("211d1a"))
-	draw_rect(Rect2(eye_offset.x + 2, eye_offset.y - 3, 1, 1), Color("211d1a"))
-
 	if attack_visual_left > 0.0:
 		var angle := facing.angle()
 		draw_arc(Vector2.ZERO, 12.0, angle - 0.65, angle + 0.65, 10, Color("fff1bd"), 2.0)
