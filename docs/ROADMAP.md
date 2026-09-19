@@ -4,24 +4,20 @@
 
 - [x] Godot 프로젝트 골격
 - [x] 16px 월드 기준
-- [x] 플레이어 이동
-- [x] 카메라
+- [x] 플레이어 이동 / 카메라
 - [x] JSON 데이터 레이어
-- [x] GameState
-- [x] 자동 smoke test
 - [x] GitHub Actions
 
 ## V0.2 — Exploration Foundation
 
-- [ ] Sunnyside 타일셋 연결
-- [ ] TileMapLayer 기반 필드
-- [x] 충돌 레이어 규칙
-- [x] 상호작용 시스템
+- [x] 충돌 레이어
+- [x] 상호작용
 - [x] NPC 대화
-- [ ] 맵 전환
 - [x] 세이브/로드 V1
+- [ ] 실제 TileMapLayer 필드
+- [ ] 맵 전환
 
-## V0.3 — Combat Vertical Slice
+## V0.3 — Combat Prototype
 
 - [x] 플레이어 공격
 - [x] 회피
@@ -30,37 +26,66 @@
 - [x] 슬라임 / 고블린 / 스켈레톤
 - [x] 드롭
 - [x] 경험치 / 레벨
+- [ ] 실제 hitbox/hurtbox
 - [ ] 첫 보스
 
-## V0.4 — Collection RPG
+## V0.4 — Collection RPG Prototype
 
 - [x] 영웅 해금
-- [x] 4인 파티
+- [x] 최대 4인 파티
 - [x] 캐릭터 교체
 - [x] 몬스터 도감
 - [x] 인벤토리
 - [x] 장비
-- [x] 유물
+- [x] 유물 슬롯
 
-## V0.5 — Content Systems
+## V0.4.1 — Stabilization
 
-- [ ] 퀘스트
+- [x] 누락 데이터 교차검증
+- [x] save version 검증
+- [x] 손상 save 정규화
+- [x] runtime smoke test
+- [x] data integrity test
+- [x] gameplay regression test
+- [x] UI unique-name 충돌 수정
+- [x] main 병합 품질 게이트 정의
+
+## Vertical Slice — 현재 최우선
+
+- [ ] 실제 게임용 16px 에셋 규격 확립
+- [ ] 시작 마을 TileMap
+- [ ] 초원 TileMap
+- [ ] 캐릭터 실제 애니메이션
+- [ ] 적 실제 애니메이션
+- [ ] hitbox / hurtbox 전투
+- [ ] 첫 퀘스트
+- [ ] 첫 던전
+- [ ] 첫 보스
+- [ ] Windows export
+- [ ] 실플레이 검수
+
+## 이후 Content Systems
+
+Vertical Slice 검증 후에만 확장합니다.
+
 - [ ] 상점
 - [ ] 제작
-- [ ] 채집
-- [ ] 채광
+- [ ] 채집 / 채광
 - [ ] 낚시
 - [ ] 낮/밤
+- [ ] 추가 지역
+- [ ] 추가 영웅/몬스터
 
-## V0.9 — Polish
+## V1.0 목표
 
-- [ ] UI/UX
-- [ ] 밸런싱
-- [ ] 사운드
-- [ ] 접근성
-- [ ] 성능 최적화
-- [ ] Windows export 자동화
+- 영웅 12명
+- 몬스터 30종
+- 보스 5종
+- 마을 2곳
+- 필드 4곳
+- 던전 3곳
+- 장비 약 80종
+- 유물 약 30종
+- 플레이타임 약 4~6시간
 
-## V1.0
-
-완결 가능한 4~6시간 분량의 첫 상용 품질 빌드를 목표로 한다.
+단, Vertical Slice의 안정성과 재미가 확인된 후 콘텐츠를 확대합니다.

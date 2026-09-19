@@ -7,6 +7,27 @@
     "stack_limit": 99
   },
   {
+    "id": "green_gel",
+    "name": "초록 젤",
+    "type": "material",
+    "rarity": "common",
+    "stack_limit": 99
+  },
+  {
+    "id": "worn_coin",
+    "name": "낡은 동전",
+    "type": "material",
+    "rarity": "common",
+    "stack_limit": 99
+  },
+  {
+    "id": "old_bone",
+    "name": "오래된 뼈",
+    "type": "material",
+    "rarity": "common",
+    "stack_limit": 99
+  },
+  {
     "id": "iron_scrap",
     "name": "철 조각",
     "type": "material",
