@@ -1,0 +1,17 @@
+# Godot generated
+.godot/
+.import/
+
+# Export output
+build/
+dist/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local-only commercial/source assets
+assets/sunnyside/**
+!assets/sunnyside/.gitkeep
