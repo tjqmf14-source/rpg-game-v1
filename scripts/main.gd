@@ -1,16 +1,31 @@
 extends Node2D
 
-const TILE_SIZE := 16
-const VIEWPORT_SIZE := Vector2i(480, 270)
+const MAP_SCENES := {
+	"start_village": "res://scenes/world/start_village.tscn",
+	"meadow": "res://scenes/world/meadow.tscn"
+}
 
+@onready var world_root: Node2D = $WorldRoot
 @onready var player: CharacterBody2D = $Player
+@onready var camera: Camera2D = $Player/Camera2D
 @onready var toast_label: Label = $UI/Toast
+
+var current_map: Node2D
+var current_map_id: String = ""
 
 
 func _ready() -> void:
-	queue_redraw()
+	add_to_group("game_root")
 	GameState.player_leveled_up.connect(_on_player_leveled_up)
 	GameState.hero_unlocked.connect(_on_hero_unlocked)
+
+	camera.limit_left = 0
+	camera.limit_top = 0
+	camera.limit_right = 960
+	camera.limit_bottom = 540
+
+	var saved_map_id := _normalize_map_id(String(GameState.world_state.get("map_id", "start_village")))
+	_load_map(saved_map_id, "", true)
 	_update_hud()
 
 
@@ -25,6 +40,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	if event.keycode == KEY_F5:
+		GameState.world_state["map_id"] = current_map_id
 		GameState.set_player_position(player.position)
 		var ok := SaveManager.save_game()
 		_show_toast("Saved" if ok else "Save failed")
@@ -32,26 +48,67 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.keycode == KEY_F9:
 		var ok := SaveManager.load_game()
 		if ok:
-			player.position = GameState.get_player_position()
+			var loaded_map_id := _normalize_map_id(String(GameState.world_state.get("map_id", "start_village")))
+			_load_map(loaded_map_id, "", true)
 			_show_toast("Loaded")
 		else:
 			_show_toast("No save data")
 		get_viewport().set_input_as_handled()
 
 
-func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO, Vector2(VIEWPORT_SIZE)), Color("667a3f"))
-	draw_rect(Rect2(0, 112, 480, 48), Color("a98b5d"))
-	draw_rect(Rect2(208, 0, 64, 270), Color("a98b5d"))
+func change_map(map_id: String, spawn_name: String = "SpawnDefault") -> bool:
+	return _load_map(_normalize_map_id(map_id), spawn_name, false)
 
-	draw_rect(Rect2(16, 16, 112, 64), Color("467b91"))
-	for x in range(16, 128, TILE_SIZE):
-		draw_line(Vector2(x, 16), Vector2(x, 80), Color(0.25, 0.43, 0.50, 0.35), 1.0)
 
-	for x in range(0, VIEWPORT_SIZE.x + 1, TILE_SIZE):
-		draw_line(Vector2(x, 0), Vector2(x, VIEWPORT_SIZE.y), Color(0, 0, 0, 0.05), 1.0)
-	for y in range(0, VIEWPORT_SIZE.y + 1, TILE_SIZE):
-		draw_line(Vector2(0, y), Vector2(VIEWPORT_SIZE.x, y), Color(0, 0, 0, 0.05), 1.0)
+func get_current_map_id() -> String:
+	return current_map_id
+
+
+func _load_map(map_id: String, spawn_name: String, restore_saved_position: bool) -> bool:
+	var scene_path := String(MAP_SCENES.get(map_id, ""))
+	if scene_path.is_empty():
+		push_error("Main: unknown map id: %s" % map_id)
+		return false
+
+	var packed := load(scene_path) as PackedScene
+	if packed == null:
+		push_error("Main: failed to load map scene: %s" % scene_path)
+		return false
+
+	var next_map := packed.instantiate() as Node2D
+	if next_map == null:
+		push_error("Main: failed to instantiate map scene: %s" % scene_path)
+		return false
+
+	if current_map != null and is_instance_valid(current_map):
+		current_map.free()
+
+	current_map = next_map
+	world_root.add_child(current_map)
+	current_map_id = map_id
+	GameState.world_state["map_id"] = map_id
+
+	if restore_saved_position:
+		player.position = GameState.get_player_position()
+	else:
+		var spawn := current_map.get_node_or_null(spawn_name) as Marker2D
+		if spawn == null:
+			spawn = current_map.get_node_or_null("SpawnDefault") as Marker2D
+		if spawn == null:
+			push_error("Main: map %s has no usable spawn point" % map_id)
+			return false
+		player.global_position = spawn.global_position
+
+	GameState.set_player_position(player.position)
+	return true
+
+
+func _normalize_map_id(map_id: String) -> String:
+	if map_id == "bootstrap_meadow":
+		return "start_village"
+	if MAP_SCENES.has(map_id):
+		return map_id
+	return "start_village"
 
 
 func _update_hud() -> void:
@@ -60,14 +117,15 @@ func _update_hud() -> void:
 		return
 
 	var hero := GameDatabase.get_hero(GameState.get_active_hero_id())
-	label.text = "%s  Lv.%d  HP %d/%d  XP %d/%d  Gold %d" % [
+	label.text = "%s  Lv.%d  HP %d/%d  XP %d/%d  Gold %d  [%s]" % [
 		String(hero.get("name", "방랑자")),
 		GameState.player_level,
 		GameState.player_hp,
 		GameState.player_max_hp,
 		GameState.experience,
 		GameState.experience_to_next,
-		GameState.gold
+		GameState.gold,
+		current_map_id
 	]
 
 
