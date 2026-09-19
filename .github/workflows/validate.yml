@@ -42,3 +42,6 @@ jobs:
 
       - name: Gameplay regression test
         run: godot --headless --path . res://tests/gameplay_regression_runner.tscn
+
+      - name: Combat runtime test
+        run: godot --headless --path . res://tests/combat_runtime_runner.tscn
