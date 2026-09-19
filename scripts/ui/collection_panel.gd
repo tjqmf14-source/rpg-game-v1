@@ -1,8 +1,8 @@
 extends PanelContainer
 class_name CollectionPanel
 
-@onready var title_label: Label = %Title
-@onready var body_label: Label = %Body
+@onready var title_label: Label = %CollectionTitle
+@onready var body_label: Label = %CollectionBody
 
 var mode: String = "party"
 
