@@ -57,11 +57,11 @@
 - [x] 초원 독립 씬/충돌/스폰/적 기반\n- [ ] 초원 실제 TileMap
 - [ ] 캐릭터 실제 애니메이션
 - [ ] 적 실제 애니메이션
-- [ ] hitbox / hurtbox 전투
+- [x] hitbox / hurtbox 전투
 - [ ] 첫 퀘스트
 - [ ] 첫 던전
 - [ ] 첫 보스
-- [ ] Windows export
+- [x] Windows export 자동화
 - [ ] 실플레이 검수
 
 ## 이후 Content Systems
