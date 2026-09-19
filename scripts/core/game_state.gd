@@ -29,6 +29,7 @@ var world_state: Dictionary = {
 }
 
 var dialogue_open: bool = false
+var menu_open: bool = false
 
 var player_level: int = 1
 var experience: int = 0
