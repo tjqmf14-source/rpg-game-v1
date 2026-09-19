@@ -1,0 +1,130 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/meadow.gd" id="1_map"]
+[ext_resource type="Script" path="res://scripts/world/map_exit.gd" id="2_exit"]
+[ext_resource type="Script" path="res://scripts/combat/enemy_controller.gd" id="3_enemy"]
+
+[sub_resource type="RectangleShape2D" id="ExitShape"]
+size = Vector2(40, 112)
+
+[sub_resource type="RectangleShape2D" id="HorizontalBoundary"]
+size = Vector2(960, 16)
+
+[sub_resource type="RectangleShape2D" id="VerticalBoundary"]
+size = Vector2(16, 540)
+
+[sub_resource type="RectangleShape2D" id="EnemyShape"]
+size = Vector2(12, 10)
+
+[sub_resource type="RectangleShape2D" id="RockShape"]
+size = Vector2(104, 64)
+
+[node name="Meadow" type="Node2D"]
+script = ExtResource("1_map")
+
+[node name="SpawnDefault" type="Marker2D" parent="."]
+position = Vector2(72, 270)
+
+[node name="SpawnFromVillage" type="Marker2D" parent="."]
+position = Vector2(72, 270)
+
+[node name="Boundaries" type="Node2D" parent="."]
+
+[node name="Top" type="StaticBody2D" parent="Boundaries"]
+position = Vector2(480, -8)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/Top"]
+shape = SubResource("HorizontalBoundary")
+
+[node name="Bottom" type="StaticBody2D" parent="Boundaries"]
+position = Vector2(480, 548)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/Bottom"]
+shape = SubResource("HorizontalBoundary")
+
+[node name="Left" type="StaticBody2D" parent="Boundaries"]
+position = Vector2(-8, 270)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/Left"]
+shape = SubResource("VerticalBoundary")
+
+[node name="Right" type="StaticBody2D" parent="Boundaries"]
+position = Vector2(968, 270)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/Right"]
+shape = SubResource("VerticalBoundary")
+
+[node name="RockA" type="StaticBody2D" parent="."]
+position = Vector2(292, 360)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RockA"]
+shape = SubResource("RockShape")
+
+[node name="RockB" type="StaticBody2D" parent="."]
+position = Vector2(750, 366)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RockB"]
+shape = SubResource("RockShape")
+
+[node name="ExitToVillage" type="Area2D" parent="."]
+position = Vector2(36, 270)
+collision_layer = 0
+collision_mask = 1
+monitoring = true
+script = ExtResource("2_exit")
+target_map_id = "start_village"
+target_spawn = "SpawnFromMeadow"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ExitToVillage"]
+shape = SubResource("ExitShape")
+
+[node name="Slime" type="CharacterBody2D" parent="."]
+position = Vector2(280, 196)
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("3_enemy")
+monster_id = "meadow_slime"
+max_hp = 36
+move_speed = 25.0
+contact_damage = 5
+xp_reward = 12
+gold_reward = 2
+item_drop_id = "wild_herb"
+item_drop_chance = 1.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Slime"]
+shape = SubResource("EnemyShape")
+
+[node name="Goblin" type="CharacterBody2D" parent="."]
+position = Vector2(624, 286)
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("3_enemy")
+monster_id = "goblin_scout"
+max_hp = 52
+move_speed = 35.0
+contact_damage = 8
+xp_reward = 18
+gold_reward = 4
+item_drop_id = "iron_scrap"
+item_drop_chance = 0.8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Goblin"]
+shape = SubResource("EnemyShape")
+
+[node name="Skeleton" type="CharacterBody2D" parent="."]
+position = Vector2(806, 176)
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("3_enemy")
+monster_id = "restless_skeleton"
+max_hp = 60
+move_speed = 30.0
+contact_damage = 10
+xp_reward = 24
+gold_reward = 6
+item_drop_id = "ancient_shard"
+item_drop_chance = 0.5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Skeleton"]
+shape = SubResource("EnemyShape")
