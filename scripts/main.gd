@@ -3,10 +3,34 @@ extends Node2D
 const TILE_SIZE := 16
 const VIEWPORT_SIZE := Vector2i(480, 270)
 
+@onready var player: CharacterBody2D = $Player
+@onready var toast_label: Label = $UI/Toast
+
 
 func _ready() -> void:
 	queue_redraw()
 	_update_hud()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not (event is InputEventKey):
+		return
+	if not event.pressed or event.echo:
+		return
+
+	if event.keycode == KEY_F5:
+		GameState.set_player_position(player.position)
+		var ok := SaveManager.save_game()
+		_show_toast("Saved" if ok else "Save failed")
+		get_viewport().set_input_as_handled()
+	elif event.keycode == KEY_F9:
+		var ok := SaveManager.load_game()
+		if ok:
+			player.position = GameState.get_player_position()
+		_show_toast("Loaded")
+		else:
+			_show_toast("No save data")
+		get_viewport().set_input_as_handled()
 
 
 func _draw() -> void:
@@ -38,3 +62,9 @@ func _update_hud() -> void:
 		GameDatabase.monsters.size(),
 		GameDatabase.items.size()
 	]
+
+
+func _show_toast(message: String) -> void:
+	toast_label.text = message
+	toast_label.show()
+	get_tree().create_timer(1.5).timeout.connect(func() -> void: toast_label.hide())

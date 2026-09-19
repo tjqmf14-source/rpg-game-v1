@@ -11,6 +11,7 @@ run/main_scene="res://scenes/main.tscn"
 
 GameState="*res://scripts/core/game_state.gd"
 GameDatabase="*res://scripts/core/game_database.gd"
+SaveManager="*res://scripts/core/save_manager.gd"
 
 [display]
 
