@@ -1,5 +1,7 @@
 extends Node
 
+const MeadowTrial = preload("res://scripts/quests/meadow_trial.gd")
+
 var failures: Array[String] = []
 
 
@@ -7,6 +9,7 @@ func _ready() -> void:
 	GameDatabase.reload()
 	_test_clean_state()
 	_test_collection_and_equipment()
+	_test_first_quest()
 	_test_progression()
 	_test_corrupt_save_sanitization()
 	_test_save_round_trip()
@@ -58,6 +61,25 @@ func _test_collection_and_equipment() -> void:
 	GameState.record_monster_defeat("missing_monster")
 	_expect(GameState.get_monster_defeats("meadow_slime") == 2, "Monster codex must count valid defeats")
 	_expect(GameState.get_monster_defeats("missing_monster") == 0, "Unknown monster must not enter codex")
+
+
+func _test_first_quest() -> void:
+	_reset_state()
+	_expect(MeadowTrial.get_status() == "available", "First quest should begin as available")
+	MeadowTrial.advance()
+	_expect(MeadowTrial.get_status() == "active", "Talking to Adele should start first quest")
+	GameState.record_monster_defeat("meadow_slime")
+	GameState.record_monster_defeat("goblin_scout")
+	GameState.record_monster_defeat("restless_skeleton")
+	_expect(MeadowTrial.get_status() == "ready", "Required meadow defeats should make quest ready")
+	var old_gold := GameState.gold
+	MeadowTrial.advance()
+	_expect(MeadowTrial.get_status() == "completed", "Turning in first quest should complete it")
+	_expect(GameState.gold == old_gold + MeadowTrial.GOLD_REWARD, "First quest gold reward must be granted once")
+	_expect(GameState.get_item_amount(MeadowTrial.ITEM_REWARD_ID) == 1, "First quest item reward must be granted")
+	MeadowTrial.advance()
+	_expect(GameState.gold == old_gold + MeadowTrial.GOLD_REWARD, "Completed quest must not grant duplicate gold")
+	_expect(GameState.get_item_amount(MeadowTrial.ITEM_REWARD_ID) == 1, "Completed quest must not grant duplicate items")
 
 
 func _test_progression() -> void:

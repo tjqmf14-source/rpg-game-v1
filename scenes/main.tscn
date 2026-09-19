@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="2_player"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/ui/dialogue_box.gd" id="4_dialogue"]
 [ext_resource type="Script" path="res://scripts/ui/collection_panel.gd" id="5_collection"]
 [ext_resource type="Script" path="res://scripts/combat/hurtbox.gd" id="6_hurtbox"]
+[ext_resource type="Script" path="res://scripts/ui/quest_tracker.gd" id="7_quest_tracker"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
 size = Vector2(10, 10)
@@ -75,6 +76,15 @@ text = "RELIC BOUND"
 
 [node name="Help" type="Label" parent="UI/Margin/VBox"]
 text = "WASD Move | J Attack | K Dodge | E Talk | 1-4 Hero | P Party | I Bag | C Codex"
+
+[node name="QuestTracker" type="Label" parent="UI"]
+visible = false
+offset_left = 8.0
+offset_top = 60.0
+offset_right = 472.0
+offset_bottom = 80.0
+text = "Quest"
+script = ExtResource("7_quest_tracker")
 
 [node name="Toast" type="Label" parent="UI"]
 visible = false

@@ -1,8 +1,9 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/start_village.gd" id="1_map"]
 [ext_resource type="Script" path="res://scripts/interaction/interactable_npc.gd" id="2_npc"]
 [ext_resource type="Script" path="res://scripts/world/map_exit.gd" id="3_exit"]
+[ext_resource type="Script" path="res://scripts/quests/meadow_trial_npc.gd" id="4_quest_npc"]
 
 [sub_resource type="RectangleShape2D" id="NpcShape"]
 size = Vector2(12, 12)
@@ -94,6 +95,17 @@ reward_item_id = "leather_guard"
 reward_once_flag = "recruit_mira"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Mira"]
+shape = SubResource("NpcShape")
+
+[node name="Adele" type="Area2D" parent="."]
+position = Vector2(472, 174)
+collision_layer = 2
+collision_mask = 0
+monitoring = false
+script = ExtResource("4_quest_npc")
+speaker_name = "촌장 아델"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Adele"]
 shape = SubResource("NpcShape")
 
 [node name="ExitToMeadow" type="Area2D" parent="."]
