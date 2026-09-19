@@ -12,14 +12,14 @@
 - Art: GPT 이미지 생성 기반 오리지널 에셋 + 게임용 후처리
 - Core loop: 탐험 → 전투 → 수집 → 성장 → 던전 → 보스
 
-## 현재 상태 — V0.4.1 Stabilization
+## 현재 상태 — V0.4.2 Playtest Build
 
 구현됨:
 
 - 8방향 이동 / 카메라
 - NPC 상호작용 / 대화
 - 저장 / 불러오기
-- 기본 실시간 전투 / 회피 / 적 AI
+- 물리 hitbox/hurtbox 기반 실시간 전투 / 회피 / 적 AI
 - 슬라임 / 고블린 / 스켈레톤
 - 드롭 / 경험치 / 레벨업
 - 영웅 영입 / 최대 4인 파티 / 캐릭터 전환
@@ -27,6 +27,7 @@
 - 몬스터 도감
 - 손상 save 정규화 및 버전 검증
 - GitHub Actions 품질 게이트
+- Windows 실행 빌드 자동 생성
 
 ## 품질 게이트
 
@@ -36,10 +37,17 @@ main 병합 전 아래 검사를 모두 통과해야 합니다.
 2. Runtime smoke test
 3. Data integrity test
 4. Gameplay regression test
+5. Combat runtime test
 
 자세한 기준은 `docs/QUALITY_GATE.md`를 참고하세요.
 
 ## 실행
+
+### 방법 A — GitHub Windows 빌드
+
+GitHub Actions의 `Windows Playtest Build`에서 `RELIC-BOUND-Windows-Playtest` Artifact를 받아 압축을 풀고 `RelicBound.exe`를 실행합니다.
+
+### 방법 B — Godot
 
 1. Godot 4.7.2 설치
 2. `project.godot` 열기

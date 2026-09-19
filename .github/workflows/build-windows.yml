@@ -1,4 +1,4 @@
-name: Godot Validation
+name: Windows Playtest Build
 
 on:
   push:
@@ -13,28 +13,25 @@ permissions:
   contents: read
 
 jobs:
-  validate:
-    name: Godot 4.7.2 quality gate
+  build:
+    name: Export Windows playtest
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Setup Godot
+      - name: Setup Godot with export templates
         uses: chickensoft-games/setup-godot@v2
         with:
           version: 4.7.2
           use-dotnet: false
-          include-templates: false
-
-      - name: Show Godot version
-        run: godot --version
+          include-templates: true
 
       - name: Import project
         run: godot --headless --path . --editor --quit
 
-      - name: Smoke test
+      - name: Runtime smoke test
         run: godot --headless --path . res://tests/smoke_runner.tscn
 
       - name: Data integrity test
@@ -45,3 +42,21 @@ jobs:
 
       - name: Combat runtime test
         run: godot --headless --path . res://tests/combat_runtime_runner.tscn
+
+      - name: Export Windows release
+        run: |
+          mkdir -p build/windows
+          godot --headless --path . --export-release "Windows Desktop" build/windows/RelicBound.exe
+
+      - name: Verify Windows build
+        run: |
+          test -f build/windows/RelicBound.exe
+          test -f build/windows/RelicBound.pck
+
+      - name: Upload playtest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RELIC-BOUND-Windows-Playtest
+          path: build/windows/
+          if-no-files-found: error
+          retention-days: 14

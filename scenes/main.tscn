@@ -1,16 +1,20 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="2_player"]
 [ext_resource type="Script" path="res://scripts/interaction/interaction_sensor.gd" id="3_sensor"]
 [ext_resource type="Script" path="res://scripts/ui/dialogue_box.gd" id="4_dialogue"]
 [ext_resource type="Script" path="res://scripts/ui/collection_panel.gd" id="5_collection"]
+[ext_resource type="Script" path="res://scripts/combat/hurtbox.gd" id="6_hurtbox"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
 size = Vector2(10, 10)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_interaction"]
 radius = 22.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_player_hurtbox"]
+size = Vector2(10, 14)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -26,6 +30,17 @@ script = ExtResource("2_player")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
 position = Vector2(0, 3)
 shape = SubResource("RectangleShape2D_player")
+
+[node name="Hurtbox" type="Area2D" parent="Player"]
+collision_layer = 8
+collision_mask = 0
+monitoring = false
+monitorable = true
+script = ExtResource("6_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player/Hurtbox"]
+position = Vector2(0, -1)
+shape = SubResource("RectangleShape2D_player_hurtbox")
 
 [node name="InteractionSensor" type="Area2D" parent="Player"]
 collision_layer = 0

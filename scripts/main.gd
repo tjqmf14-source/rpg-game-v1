@@ -67,6 +67,14 @@ func get_current_map_id() -> String:
 	return current_map_id
 
 
+func respawn_player() -> void:
+	var respawned := _load_map("start_village", "SpawnDefault", false)
+	if not respawned:
+		push_error("Main: failed to respawn player in start village")
+	GameState.respawn_player()
+	_show_toast("Returned to village")
+
+
 func _load_map(map_id: String, spawn_name: String, restore_saved_position: bool) -> bool:
 	var scene_path := String(MAP_SCENES.get(map_id, ""))
 	if scene_path.is_empty():
@@ -84,7 +92,9 @@ func _load_map(map_id: String, spawn_name: String, restore_saved_position: bool)
 		return false
 
 	if current_map != null and is_instance_valid(current_map):
-		current_map.free()
+		var old_map := current_map
+		world_root.remove_child(old_map)
+		old_map.queue_free()
 
 	current_map = next_map
 	world_root.add_child(current_map)
