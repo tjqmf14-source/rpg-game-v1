@@ -24,7 +24,7 @@ func _reset_state() -> void:
 		"world_state": {
 			"map_id": "start_village",
 			"player_x": 240.0,
-			"player_y": 135.0,
+			"player_y": 270.0,
 			"flags": {}
 		}
 	})
@@ -97,7 +97,7 @@ func _test_corrupt_save_sanitization() -> void:
 			}
 		},
 		"world_state": {
-			"map_id": "start_village",
+			"map_id": "bootstrap_meadow",
 			"player_x": 999999999.0,
 			"player_y": -999999999.0,
 			"flags": {"valid_flag": true, "false_flag": false}
@@ -120,6 +120,7 @@ func _test_corrupt_save_sanitization() -> void:
 	var relics: Array = gear.get("relics", [])
 	_expect(relics.size() == 1 and String(relics[0]) == "wind_charm", "Relics must be valid unique and capped")
 	_expect(GameState.get_player_position() == Vector2(100000.0, -100000.0), "Extreme player position must be clamped")
+	_expect(String(GameState.world_state.get("map_id", "")) == "start_village", "Legacy bootstrap map id must migrate to start_village")
 	_expect(not GameState.dialogue_open and not GameState.menu_open, "Transient UI state must reset on load")
 
 
