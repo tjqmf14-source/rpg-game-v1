@@ -6,6 +6,10 @@ var failures: Array[String] = []
 func _init() -> void:
 	_check_required_file("res://project.godot")
 	_check_required_file("res://scenes/main.tscn")
+	_check_required_file("res://scripts/core/save_manager.gd")
+	_check_required_file("res://scripts/interaction/interaction_sensor.gd")
+	_check_required_file("res://scripts/interaction/interactable_npc.gd")
+	_check_required_file("res://scripts/ui/dialogue_box.gd")
 	_check_json_array("res://data/heroes.json")
 	_check_json_array("res://data/monsters.json")
 	_check_json_array("res://data/items.json")
